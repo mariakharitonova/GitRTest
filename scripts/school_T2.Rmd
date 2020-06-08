@@ -1,0 +1,262 @@
+---
+params: 
+  file_path: x
+  school_name: x
+  set_title: x
+  student_data: x
+  includeT2: x
+title: "`r params$set_title`"
+
+     
+
+---
+
+
+
+
+Timepoint 2  {data-icon="fa-table"}
+=====================================  
+
+Row {data-height=650, .tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### Summary Scores for School by Classroom
+```{r}
+
+make_summary_table(teacher_links_2[,2:ncol(teacher_links_2)], params$school_name)
+
+``` 
+
+### Summary Plot for School
+```{r}
+
+n_school_2 <- dim(subset(district_time2, district_time2$School == params$school_name))[1]
+
+if(n_school_2 >= 5){
+  data_2 <- school_for_plotting_2[school_for_plotting_2$School==params$school_name,]
+  
+  make_summary_plot(data_2, params$school_name, n_school_2)
+} else {
+  
+  print("Not enough data collected in Timepoint 2")
+}
+
+
+```
+
+```{r, echo = F, results='asis'}
+
+
+if("K" %in% school_level_time2$Grade){
+  if(sum(school_level_time2[school_level_time2$Grade=="K",3]) > 0) {
+    cat(paste0('\n### Summary Plot, Kindergarten', '\n'))
+  }
+}
+```
+ 
+```{r}
+
+if(n_school_2 > 0){
+
+  if("K" %in% school_level_time2$Grade){
+    if(sum(school_level_time2[school_level_time2$Grade=="K",3]) >= 5) {
+
+      school_level_k <- grades_for_plotting_2[(grades_for_plotting_2$School==params$school_name & grades_for_plotting_2$Grade=="K"),]
+      
+      n_K <- dim(subset(district_time2, district_time2$School == params$school_name & district_time2$Grade == "K"))[1]
+      
+      make_summary_plot(school_level_k, params$school_name, n_K)
+    }
+
+  } else {
+    print("Not enough data collected at Timepoint 2")
+  }
+}
+```
+    
+```{r, echo = F, results='asis'}
+
+if(1 %in% school_level_time2$Grade) {
+  if(sum(school_level_time2[school_level_time2$Grade==1,3]) > 0) {
+    cat(paste0('\n### Summary Plot, Grade 1', '\n'))
+  }
+}
+```
+
+
+```{r}
+if(n_school_2 > 0){
+
+  if(1 %in% school_level_time2$Grade){
+    if(sum(school_level_time2[school_level_time2$Grade==1,3]) >= 5) {
+
+      n_1 <- dim(subset(district_time2, district_time2$School == params$school_name & district_time2$Grade == 1))[1]
+      school_level_1 <- grades_for_plotting_2[(grades_for_plotting_2$School==params$school_name & grades_for_plotting_2$Grade==1),]
+      
+      make_summary_plot(school_level_1, params$school_name, n_1)
+    }
+
+
+  } else {
+
+    print("Not enough data collected at Timepoint 2")
+  }
+}
+
+```
+
+```{r, echo = F, results='asis'}
+
+if(2 %in% school_level_time2$Grade){
+  if(sum(school_level_time2[school_level_time2$Grade==2,3]) > 0) {
+    cat(paste0('\n### Summary Plot, Grade 2', '\n'))
+  }
+}
+```
+
+
+```{r}
+if(n_school_2 > 0){
+
+  if(2 %in% school_level_time2$Grade){
+    if(sum(school_level_time2[school_level_time2$Grade==2,3]) >= 5) {
+
+      n_2 <- dim(subset(district_time2, district_time2$School == params$school_name & district_time2$Grade == 2))[1]
+      school_level_2 <- grades_for_plotting_2[(grades_for_plotting_2$School==params$school_name & grades_for_plotting_2$Grade==2),]
+      
+      make_summary_plot(school_level_2, params$school_name, n_2)
+    }
+
+
+  } else {
+
+    print("Not enough data collected at Timepoint 2")
+  }
+}
+
+```
+
+```{r, echo = F, results='asis'}
+
+if(3 %in% school_level_time2$Grade){
+  if(sum(school_level_time2[school_level_time2$Grade==3,3]) > 0) {
+    cat(paste0('\n### Summary Plot, Grade 3', '\n'))
+  }
+}
+```
+
+
+```{r}
+if(n_school_2 > 0){
+  if(3 %in% school_level_time2$Grade){
+    if(sum(school_level_time2[school_level_time2$Grade==3,3]) >= 5) {
+      
+      n_3 <- dim(subset(district_time2, district_time2$School == params$school_name & district_time2$Grade == 3))[1]
+      
+      school_level_3 <- grades_for_plotting_2[(grades_for_plotting_2$School==params$school_name & grades_for_plotting_2$Grade==3),]
+      
+      make_summary_plot(school_level_3, params$school_name, n_3)
+    }
+
+  } else {
+    print("Not enough data collected at Timepoint 2")
+  }
+}
+
+
+```
+
+```{r, echo = F, results='asis'}
+
+if(params$student_data == TRUE) {
+  cat(paste0('\n### Student-level data', '\n'))
+}
+```
+
+
+```{r}
+
+if(n_school_2 > 0){
+
+  #prep data for student-level table (with links to individual student reports)
+  student_links_school_2 <- make_student_links_school_pdf(school_rel_2, 2)
+  
+  make_student_level_table_links(student_links_school_2)
+  
+  
+  # student_level_2 <- district_time2[district_time2$School == params$school_name, c("StudentID", "Timepoint", "Language", "Grade", "LastName", "OverallScore", "ERScore", "SPTScore", "SPSScore", "SCScore")]
+  # names(student_level_2) <- c("Student ID", "Timepoint", "Language", "Grade", "Last Name", "Overall Score", "Emotion Recognition", "Social Perspective-Taking", "Social Problem-Solving", "Self-Control")
+  # 
+  # 
+  # make_student_level_table(student_level_2)
+  # 
+} else{
+  
+  print("Not enough collected in Timepoint 1")
+}
+
+```
+
+### PDF report
+```{r}
+
+xfun::embed_file(pdf_schools_2)
+```
+
+Change Over Time {data-icon="fa-bar-chart"}
+=====================================  
+
+Row {data-height=650, .tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### Change over time
+```{r}
+
+common_students <- intersect(district$StudentID, district_time2$StudentID)
+
+#common_students <- intersect(district[district$School==params$school_name,]$TeacherLast, district_time2[district_time2$School==params$school_name,]$TeacherLast)
+
+
+school_common_1 <- district[(district$StudentID %in% common_students & 
+                               district$School== params$school_name),]
+
+school_common_2 <- district_time2[(district_time2$School == params$school_name & 
+                                     district_time2$StudentID %in% common_students),]
+
+
+#if sufficient number of students took SELweb at both timepoints
+if(dim(school_common_1)[1] >=10 & dim(school_common_2)[1] >= 10){
+  
+  school_time1_plotting <- transform_for_plotting(school_common_1)
+  school_time2_plotting <- transform_for_plotting(school_common_2)
+
+  
+  data_1 <- school_time1_plotting %>% 
+  mutate(Timepoint = "Fall")
+
+  data_2 <- school_time2_plotting %>% 
+    mutate(Timepoint = "Spring")
+
+  data_change <- rbind(data_1, data_2)
+  
+  
+  plot_change_over_time_ee(data_change, params$school_name, dim(school_common_1)[1])
+
+
+
+
+} else {
+  print("Not enough data collected at both time points")
+  
+}
+
+
+```
+
+### PDF report
+```{r}
+
+xfun::embed_file(pdf_schools_change)
+```
+
+

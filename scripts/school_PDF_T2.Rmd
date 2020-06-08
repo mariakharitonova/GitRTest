@@ -1,0 +1,100 @@
+---
+mainfont: Nunito
+font: Nunito
+fontsize: 14 pt
+output:
+  pdf_document:
+    latex_engine: xelatex
+    includes:
+      in_header: header.tex
+    keep_tex: false
+params: 
+  file_path: data
+  school_name: x
+  set_title: x
+geometry: "left=1in,right=1in,top=1in,bottom=0.6in"
+
+---
+
+
+
+```{r rmarkdown-setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(dev = "cairo_pdf")
+options(knitr.kable.NA = "")
+options(kableExtra.latex.load_packages = FALSE)
+
+```
+
+```{r setup, include=FALSE}
+
+#create tables for each time point (each row = TEACHER)
+#teacher_links_2 <- make_teacher_links(district_time2[district_time2$School==params$school_name,],2)
+
+school_rel_2 <- district_time2 %>% 
+  filter(School == params$school_name) 
+
+teacher_links_2 <- make_teacher_links(school_rel_2,2)
+
+
+teacher_links_2_pdf <- teacher_links_2 %>%
+  mutate(Teacher = str_extract(Teacher, "(?<=\\>).+?(?=\\<)")) %>%
+  select(-1) %>% 
+  replace(is.na(.), "")
+
+
+school_for_plotting_2 <- prep_school_plots(district_time2)
+
+school_level_time2 <- teacher_links_2_pdf
+
+
+grades_for_plotting_2 <- prep_grade_level_plots(district_time2)
+
+```
+
+
+## Summary Plot for School
+```{r setup-pdf, echo = FALSE, warning = FALSE, results = "asis"}
+
+#source("/Volumes/GoogleDrive/My\ Drive/xSEL\ Labs/Scripts/Dashboards/flexdashboard/reports/2019-2020/PDF_Jan2020/make_summary_plot_function_pdf.R")
+
+
+n_school_2 <- dim(subset(district_time2, district_time2$School == params$school_name))[1]
+
+if(n_school_2 >= 5){
+  
+data_2 <- school_for_plotting_2[school_for_plotting_2$School==params$school_name,]
+
+#make_summary_plot(data_1, params$school_name, n_school)
+make_summary_plot_pdf(data_for_plotting_2, params$school_name, n_school_2)
+
+} else{
+  
+  print("Not enough data collected in Timepoint 1")
+}
+
+cat('\n\n\n\n')
+cat("  \n")  
+```
+Above average: $\geq$ 115; At or around average: 90-114; Below average: 70-89; Well below average: $\leq$ 69
+
+
+## Summary Table for School
+```{r summary-table, echo = FALSE}
+
+
+### Summary Scores by School
+kable(teacher_links_2_pdf, "latex", booktabs = T, align = "lccccccc", linesep = "") %>% 
+  kable_styling(latex_options = c("striped", "hold_position"), full_width = F) %>% 
+  column_spec(2:7, width = "2cm")
+
+
+cat('\n\n\n\n')
+
+```
+
+
+

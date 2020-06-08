@@ -1,0 +1,105 @@
+---
+params: 
+  file_path: x
+  school_name: x
+  teacher_name: x
+  set_title: x
+  student_id: x
+header-includes:
+- \input{header.tex}
+mainfont: Nunito
+font: Nunito
+geometry: "left=1in,right=1in,top=1in,bottom=0.6in"
+output: 
+  pdf_document:
+    latex_engine: xelatex
+    keep_tex: false
+
+
+---
+
+
+```{r rmarkdown-setup, include=FALSE}
+#fontsize: 14pt
+#\usepackage{array}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(dev = "cairo_pdf")
+options(knitr.kable.NA = "")
+options(kableExtra.latex.load_packages = FALSE)
+
+```
+
+```{r pdf, echo = FALSE, warning = FALSE, results = "asis"}
+
+
+#prepare data for tables
+
+#step 1: figure confidence intervals
+#step 2: reorganize data so that data are in long format by student with scores and CI_85
+
+
+if(params$student_id %in% district$StudentID & params$student_id %in% district_time2$StudentID){
+  student1 <- prep_for_individ_plot(district, params$student_id)
+  student2 <- prep_for_individ_plot(district_time2, params$student_id)
+  student_comb <- rbind(student1, student2) %>% mutate(Score = value)
+  dot_shape <- c(16, 18)
+} else if(params$student_id %in% district$StudentID){
+  student_comb <- prep_for_individ_plot(district, params$student_id)
+  dot_shape <- c(16)
+} else if(params$student_id %in% district_time2$StudentID){
+  student_comb <- prep_for_individ_plot(district_time2, params$student_id)
+  dot_shape <- c(17)
+}
+
+
+student_comb$Timepoint <- as.factor(student_comb$Timepoint)
+
+```
+
+##  Individual student report for `r  as.integer(params$student_id)`
+### Classroom: `r  params$teacher_name`, School: `r  params$school_name`
+
+
+```{r plot, echo = FALSE, warning = FALSE, results = "asis"}
+
+
+plot <- ggplot(data = student_comb, aes(x=variable, y = Score, ymin = 50, ymax = 150, shape = Timepoint)) + #, group = Timepoint
+  geom_point(aes(text = Score), color="black", fill = "black", size=3, position=position_dodge(0.5)) + 
+  scale_shape_manual(values=dot_shape) + 
+  geom_rect(aes(xmin = .5, xmax = 5.5, 
+                ymin = 50, ymax = 70, text = "Well-below"), fill = '#45874C', alpha = .1) +
+  geom_rect(aes(xmin = .5,xmax = 5.5,
+                ymin = 70, ymax = 90, text = "Below"), fill = '#86C17D', alpha = .1) +
+  geom_rect(aes(xmin = .5, xmax = 5.5,
+                ymin = 90, ymax = 115, text = "Average"), fill = '#C0E4B8', alpha = .1) + 
+  geom_rect(aes(xmin = .5, xmax = 5.5,
+                ymin = 115, ymax = 150, text = "Above"), fill = '#EFF7EA', alpha = .1) +
+  geom_errorbar(aes(ymin=Score-CI_85, ymax=Score+CI_85), width=.1, colour="black", position=position_dodge(.5), alpha = .2) + 
+  labs(y= "Score") + #, title=paste0(student_comb$District," - ", student_comb$School, " - ", student_comb$StudentID)
+  theme(axis.title.x = element_blank(), 
+        text = element_text(size=7), panel.background = element_blank(),
+        axis.text.x = element_text(hjust = .5),
+        legend.title=element_text(size=6),
+        legend.text = element_text(size=6)) +
+  geom_text(aes(label = round(Score+CI_85, 0), y = Score+CI_85), vjust = -.5, size = 2, position=position_dodge(.5)) +
+  geom_text(aes(label = round(Score-CI_85, 0), y = Score-CI_85), vjust = 1.5, size = 2, position=position_dodge(.5)) + 
+  ylim(50, 150)
+
+print(plot)
+
+
+
+
+
+ # annotate("rect", xmin = .5, xmax = 5.5, ymin = 50, ymax = 70, fill = '#45874C', alpha = .6, label = "well-below") +
+    # annotate("rect", xmin = .5,xmax = 5.5, ymin = 70, ymax = 90, fill = '#86C17D', alpha = .6) +
+    # annotate("rect", xmin = .5, xmax = 5.5, ymin = 90, ymax = 115,fill = '#C0E4B8', alpha = .6) + 
+    # annotate("rect", xmin = .5, xmax = 5.5, ymin = 115, ymax = 150, fill = '#EFF7EA', alpha = .6) +
+
+```
+
+
+
+

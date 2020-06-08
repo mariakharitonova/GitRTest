@@ -1,0 +1,103 @@
+Timepoint 2  {data-icon="fa-table"}
+=====================================  
+
+Row {data-height=650, .tabset .tabset-fade}
+-----------------------------------------------------------------------
+```{r}
+
+#prepare Timepoint 2 datasets
+
+
+
+
+
+```
+
+### Summary plot for classroom
+
+```{r}
+n_class_2 <- dim(subset(district_time2, district_time2$School == params$school_name & district_time2$TeacherLast == params$teacher_name))[1]
+  
+if(dim(class_for_plotting_2)[1] > 0 ){
+  
+  make_summary_plot(class_for_plotting_2, params$teacher_name, n_class_2)
+} else {
+  print("Not enough data collected in Timepoint 2")
+}
+ 
+```
+
+```{r, echo = F, results='asis'}
+
+if(params$student_data == TRUE) {
+  cat(paste0('\n### Student-level data', '\n'))
+}
+```
+
+```{r}
+if(dim(teacher_2)[1] > 0 ){
+  
+  
+  #prep data for student-level table (with links to individual student reports)
+  student_links_class_2 <- make_student_links_pdf(teacher_2, 2)
+  
+  make_student_level_table_links(student_links_class_2)
+  
+  # 
+  # student_level_2 <- teacher_2[,c("StudentID", "Timepoint", "Language", "Grade", "LastName",
+  #                                 "OverallScore", "ERScore", "SPTScore", "SPSScore", "SCScore")]
+  # names(student_level_2) <- c("Student ID", "Timepoint", "Language", "Grade", "Last Name", "Overall Score", "Emotion Recognition", "Social Perspective-Taking", "Social Problem-Solving", "Self-Control")
+  # 
+  # make_student_level_table(student_level_2)
+  
+} else {
+  print("No data collected in Timepoint 2")
+}
+```
+
+### PDF report
+```{r}
+
+xfun::embed_file(pdf_class_2)
+```
+
+Change Over Time {data-icon="fa-bar-chart"}
+=====================================  
+
+Row {data-height=650, .tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### Change over time
+```{r}
+
+#if sufficient number of students took SELweb at both timepoints
+common_students <- intersect(district$StudentID, district_time2$StudentID)
+
+class_common <- district[(district$StudentID %in% common_students &
+                               district$TeacherLast== params$teacher_name &
+                               district$School== params$school_name),]
+
+if(dim(class_for_plotting_1)[1] >= 10 & dim(class_for_plotting_2)[1] >= 10){
+  
+  class_for_plotting_1 <- class_for_plotting_1 %>% 
+  mutate(Timepoint = "Fall")
+
+  class_for_plotting_2 <- class_for_plotting_2 %>% 
+    mutate(Timepoint = "Spring")
+
+  data_class_change <- rbind(class_for_plotting_1, class_for_plotting_2)
+   
+  plot_change_over_time_ee(data_class_change, params$teacher_name, dim(class_common)[1])
+} else {
+  print("Not enough data collected at both time points (need at least 15 data points for both Fall and Spring)")
+  
+}
+
+
+```
+
+### PDF report
+```{r}
+
+xfun::embed_file(pdf_class_change)
+```

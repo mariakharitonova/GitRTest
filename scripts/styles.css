@@ -1,0 +1,66 @@
+/*@import url("https://fonts.googleapis.com/css?family=Montserrat:300,400,700");
+@import url("https://fonts.googleapis.com/css?family=Nunito:300,400,700");*/
+
+body {
+	font-family: 'Nunito', sans-serif;
+}
+.navbar-inverse {
+	background: #333F48;
+}
+.navbar.navbar-inverse .navbar-brand,
+.navbar.navbar-inverse .navbar-nav > li > a {
+  font-family: 'Montserrat', sans-serif;
+  color: #fff ;
+  font-size: 95% !important;
+}
+.navbar.navbar-inverse .navbar-nav > .active > a, 
+.navbar.navbar-inverse .navbar-nav > .active > a:hover, 
+.navbar.navbar-inverse .navbar-nav > .active > a:focus,
+.navbar.navbar-inverse .navbar-nav > li > a:hover,
+.navbar.navbar-inverse .navbar-nav > li > a:focus,
+.navbar.navbar-inverse .navbar-brand:hover,
+.navbar.navbar-inverse .navbar-brand:focus {
+  background: #5B7080;
+  color: #fff;
+}
+.nav-tabs-custom > .nav-tabs > li.active {
+	border-top-color: #00B0C7;
+}
+
+#numbers-of-students-who-completed-selweb.bg-primary,
+#numbers-of-schools-that-administered-selweb.bg-primary,
+#numbers-of-students-who-completed-selweb-1.bg-primary,
+#numbers-of-schools-that-administered-selweb-1.bg-primary,
+#pdf-report-district-level {
+	background: #8da0ae;
+}
+
+#completion-rate---overall-score .chart-title {
+	/* Green */
+	color: #333F48;
+	/* Yellow */
+	/*color: #FF7518;*/
+	/* Red */
+	/*color: #FF0039;*/
+}
+#completion-rate---any-score .chart-title {
+	/* Green */
+	color: #333F48;
+	/* Yellow */
+	/*color: #FF7518;*/
+	/* Red */
+	/*color: #FF0039;*/
+}
+
+
+a {
+	color: #FA6B03;
+}
+
+a:hover {
+  color: #00B0C7;
+}
+
+table.dataTable thead .sorting:after {
+	color: #00B0C7;
+}

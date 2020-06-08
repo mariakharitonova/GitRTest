@@ -1,0 +1,89 @@
+---
+mainfont: Nunito
+font: Nunito
+fontsize: 14 pt
+output:
+  pdf_document:
+    latex_engine: xelatex
+    includes:
+      in_header: header.tex
+    keep_tex: false
+params: 
+  file_path: data
+  school_name: x
+  set_title: x
+geometry: "left=1in,right=1in,top=1in,bottom=0.6in"
+
+
+
+---
+
+
+```{r rmarkdown-setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(dev = "cairo_pdf")
+options(knitr.kable.NA = "")
+options(kableExtra.latex.load_packages = FALSE)
+
+```
+
+
+```{r setup, include=FALSE}
+#    vertical_layout: scroll
+
+#prepare Timepoint2 datasets
+district_time2 <- subset(ee_data, ee_data$School != "NA" & ee_data$Timepoint==2) 
+district_time2[] <- lapply(district_time2, function(x) {if (is.numeric(x)) round(x, 0) else x}) #round to whole number
+
+school_links_2 <- make_school_links(district_time2, 2)
+
+data_for_plotting_2 <- transform_for_plotting(district_time2)
+
+
+school_links_2_pdf <- school_links_2 %>%
+  mutate(School = str_extract(School, "(?<=\\>).+?(?=\\<)")) %>% 
+  replace(is.na(.), "")
+
+
+#transform the data for summary plots
+data_for_plotting_2 <- transform_for_plotting(district_time2)
+
+```
+
+
+## Summary Plot for District
+```{r setup-pdf, echo = FALSE, warning = FALSE, results = "asis"}
+
+#source("/Volumes/GoogleDrive/My\ Drive/xSEL\ Labs/Scripts/Dashboards/flexdashboard/reports/2019-2020/PDF_Mar2020/make_summary_plot_function_pdf.R")
+
+
+n_district_2 <- length(district_time2$ERScore[!is.na(district_time2$ERScore)])
+
+make_summary_plot_pdf(data_for_plotting_2, district_name, n_district_2)
+#paste0(district_name, " (N = ", n_district_2, ")")
+
+cat('\n\n\n\n')
+cat("  \n")  
+```
+Above average: $\geq$ 115; At or around average: 90-114; Below average: 70-89; Well below average: $\leq$ 69
+
+## Summary Table for District
+```{r summary-table, warning = FALSE, echo = FALSE}
+
+
+#names(school_links_1_pdf)[2:3] <- c("Number of\nchildren", "Overall\nScore")
+
+### Summary Scores by School
+kable(school_links_2_pdf, "latex", booktabs = T, align = "lccccccc", linesep = "") %>% 
+  kable_styling(latex_options = c("striped", "hold_position"), full_width = F) %>% 
+  column_spec(2:7, width = "2cm")
+
+
+cat('\n\n\n\n')
+
+```
+
+

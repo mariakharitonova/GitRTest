@@ -1,0 +1,124 @@
+---
+params: 
+  file_path: x
+  set_title: x
+  student_data: х
+  includeT2: x
+title: "`r params$set_title`"
+
+
+---
+
+
+Timepoint 1  {data-icon="fa-table"}
+=====================================  
+
+Row 
+-----------------------------------------------------------------------
+### Numbers of students who completed SELweb
+
+```{r}
+valueBox(length(district$overall.cat), icon = "fa-child")
+```
+
+### Numbers of schools that administered SELweb
+
+```{r}
+#comments <- computeComments()
+valueBox(length(unique(district$School)), icon = "fa-building")
+```
+
+
+
+Row  {data-height=200, .tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### Summary Scores by School
+```{r}
+#source("/Volumes/GoogleDrive/My\ Drive/xSEL\ Labs/Scripts/Dashboards/flexdashboard/functions/EE/make_summary_table_function_summary_row.R")
+make_summary_table(school_links_1, district_name)
+
+```
+
+
+### Summary Plot for District
+```{r}
+
+n_district <- dim(district)[1]
+
+make_summary_plot(data_for_plotting_1, district_name, n_district)
+
+```
+ 
+```{r, echo = F, results='asis'}
+
+if(params$student_data == TRUE) {
+  cat(paste0('\n### Student-level data', '\n'))
+}
+``` 
+ 
+
+```{r}
+
+#prep data for student-level table (with links to individual student reports)
+student_links_district_1 <- make_student_links_district_pdf(district,1)
+
+make_student_level_table_links(student_links_district_1)
+
+
+
+```
+
+### PDF report
+```{r}
+
+xfun::embed_file(pdf_district_1)
+```
+
+```{r, child='district_T2.Rmd', eval=params$includeT2}
+
+```
+
+
+
+Glossary {data-icon="fa-question"}
+=====================================  
+* ![](/Volumes/GoogleDrive/My\ Drive/xSEL\ Labs/Scripts/Dashboards/Icons/Emotion\ Recognition\ Icon_smaller.png)
+**Emotion Recognition**:  
+Emotion recognition involves the ability to understand what others are feeling from their behavior. In everyday interactions, facial    expressions communicate what a person is feeling. For SELweb’s emotion recognition assessment, children see pictures of faces and indicate what each person is feeling. Some of the faces have very clear expressions; others are subtler. The more faces a child correctly labels, the higher their score.
+
+
+* ![](/Volumes/GoogleDrive/My\ Drive/xSEL\ Labs/Scripts/Dashboards/Icons/Social\ perspective-taking_smaller.png)
+**Social Perspective-Taking**:   
+Social perspective-taking involves the ability to understand what someone else is thinking or intends, even when it is not obvious. For SELweb’s perspective-taking assessment, children listen to brief illustrated and narrated stories and answer questions about a story character’s actions. Getting the right answer requires them to understand the character’s underlying intentions. The more questions they answer right, the higher their score.
+    
+  
+* ![](/Volumes/GoogleDrive/My\ Drive/xSEL\ Labs/Scripts/Dashboards/Icons/Problem-Solving_smaller.png)
+**Social Problem-Solving**:   
+Social problem-solving involves the ability to solve challenging everyday social problems. For SELweb’s social problem-solving assessment, students listen to brief illustrated and narrated stories about challenging situations. After each story, they answer questions about their interpretations, goals, and actions.
+  
+    
+* ![](/Volumes/GoogleDrive/My\ Drive/xSEL\ Labs/Scripts/Dashboards/Icons/Self-Control\ Icon_smaller.png)
+**Self Control**:  
+Self-control includes the skills children use to control their attention, emotions, and behavior to achieve their goals. Two SELweb assessments measure different dimensions of self-control. One measures children’s ability to delay gratification and another measures their tolerance for frustration. Each child’s overall Self- Control score reflects the extent to which they score high on those two assessments.
+    
+  
+  
+```{r}
+categories <- c("Well below average", "Below average", "At or around average", "Above average")
+values <- c("< 70", "70-89", "90-115", "> 115")
+
+color_code <- as.data.frame(rbind(categories, values))
+color_code <- color_code[2,]
+colnames(color_code) <- c("Well below average", "Below average", "At or around average", "Above average")
+
+datatable(color_code, options = list(
+  dom = 't', columnDefs = list(list(width = '120px', className = 'dt-center', targets = 0:3))), 
+          caption = "Legend for color coding", rownames = FALSE)  %>%
+  formatStyle('Well below average',  backgroundColor = '#45874C', fontWeight = 'bold') %>%
+  formatStyle('Below average',  backgroundColor = '#86C17D', fontWeight = 'bold') %>%
+  formatStyle('At or around average',  backgroundColor = '#C0E4B8', fontWeight = 'bold') %>%
+  formatStyle('Above average',  backgroundColor = '#EFF7EA', fontWeight = 'bold')
+  
+
+```

@@ -1,0 +1,87 @@
+---
+mainfont: Nunito
+font: Nunito
+fontsize: 14 pt
+output:
+  pdf_document:
+    latex_engine: xelatex
+    includes:
+      in_header: header.tex
+    keep_tex: false
+params: 
+  file_path: data
+  school_name: x
+  set_title: x
+geometry: "left=1in,right=1in,top=1in,bottom=0.6in"
+
+
+---
+
+\raggedright
+
+
+```{r rmarkdown-setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(dev = "cairo_pdf")
+options(knitr.kable.NA = "")
+options(kableExtra.latex.load_packages = FALSE)
+
+```
+
+```{r rmarkdown-prep, include=FALSE}
+#add categorical variables (above, meets, etc.)
+ee_data <- add_cat_vars(data)
+
+#divide data into 2 timepoints
+district <- subset(ee_data, ee_data$Timepoint==1) #remove NAs from school
+district[] <- lapply(district, function(x) {if (is.numeric(x)) round(x, 0) else x}) #round to whole number
+
+
+#create tables for each time point (each row = SCHOOL)
+school_links_1 <- make_school_links(district, 1)
+
+school_links_1_pdf <- school_links_1 %>%
+  mutate(School = str_extract(School, "(?<=\\>).+?(?=\\<)")) %>% 
+  replace(is.na(.), "")
+
+
+#transform the data for summary plots
+data_for_plotting_1 <- transform_for_plotting(district)
+
+```
+
+##  District-level report for `r  district_name`
+
+This is a district-level report that shows student performance on SELweb EE aggregated across `r district_name`. The summary plot shows what proportion of students in`r district_name` fall into each of the 4 competency levels based on national norms (above average, average, below average, and well-below average). The summary table shows standard scores for SELweb EE competencies for each school within `r district_name`. 
+
+## Summary Plot for District
+```{r setup-2, results = "asis"}
+
+n_district <- length(district$ERScore[!is.na(district$ERScore)])
+
+make_summary_plot_pdf(data_for_plotting_1, district_name, n_district)
+
+cat('\n\n\n\n')
+cat(' \n')
+
+```
+Above average: $\geq$ 115; At or around average: 90-114; Below average: 70-89; Well below average: $\leq$ 69
+
+
+## Summary Table for District
+```{r summary-table, results = "asis"}
+
+## Summary Scores by School
+kable(school_links_1_pdf, "latex", booktabs = T, align = "lccccccc", linesep = "") %>%
+  kable_styling(latex_options = c("striped", "hold_position"), full_width = F) %>%
+  column_spec(2:7, width = "1.5cm") %>% 
+  column_spec(1, width = "4cm")
+
+cat('\n\n\n\n')
+
+```
+
+

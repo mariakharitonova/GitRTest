@@ -1,0 +1,94 @@
+---
+mainfont: Nunito
+font: Nunito
+fontsize: 14 pt
+output:
+  pdf_document:
+    latex_engine: xelatex
+    includes:
+      in_header: header.tex
+    keep_tex: false
+params: 
+  file_path: data
+  school_name: x
+  set_title: x
+geometry: "left=1in,right=1in,top=1in,bottom=0.6in"
+
+
+
+---
+
+```{r rmarkdown-setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(dev = "cairo_pdf")
+options(knitr.kable.NA = "")
+options(kableExtra.latex.load_packages = FALSE)
+
+```
+
+
+
+```{r setup, include=FALSE}
+source("/Volumes/GoogleDrive/My\ Drive/xSEL\ Labs/Scripts/Dashboards/flexdashboard/functions/EE/plot_change_over_time_ee_function_pdf.R")
+  
+common_students <- intersect(district$StudentID, district_time2$StudentID)
+
+#common <- district_time2[(district_time2$StudentID %in% district$StudentID),]
+
+district_common_1 <- district[(district$StudentID %in% common_students),]
+district_common_2 <- district_time2[(district_time2$StudentID %in% common_students),]
+
+
+
+```
+
+
+```{r summary-plot, echo = FALSE, warning = FALSE}
+
+district_time1_plotting <- transform_for_plotting(district_common_1)
+district_time2_plotting <- transform_for_plotting(district_common_2)
+
+
+data_for_plotting_change_1 <- district_time1_plotting %>% 
+  mutate(Timepoint = "Fall")
+
+data_for_plotting_change_2 <- district_time2_plotting %>% 
+  mutate(Timepoint = "Spring")
+
+data_for_plotting_change <- rbind(data_for_plotting_change_1, data_for_plotting_change_2)
+
+
+plot_change_over_time_ee_pdf(data_for_plotting_change, district_name, dim(district_common_2)[1])
+
+cat('\n\n\n\n')
+cat("  \n")  
+```
+Above average: $\geq$ 115; At or around average: 90-114; Below average: 70-89; Well below average: $\leq$ 69
+
+## Summary Table for District: Timepoint 1 vs Timepoint 2
+```{r summary-table, warning = FALSE, echo = FALSE}
+
+
+merged_school_links_pdf <- left_join(school_links_1_pdf, school_links_2_pdf, by = "School") %>% 
+  select(School, Fall = "Number of children.x", Spring = "Number of children.y", Fall = "Overall Score.x", Spring = "Overall Score.y",
+         Fall = "Emotion Recognition.x", Spring = "Emotion Recognition.y", Fall = "Social Perspective-Taking.x", Spring = "Social Perspective-Taking.y", Fall = "Social Problem-Solving.x", Spring = "Social Problem-Solving.y", Fall = "Self Control.x",
+         Spring = "Self Control.y") %>% 
+  replace(is.na(.), "")
+
+
+### Summary Scores by School
+kable(merged_school_links_pdf, "latex", booktabs = T, align = "lcccccccccccc", linesep = "") %>% 
+  kable_styling(latex_options = c("striped", "hold_position", "bordered"), full_width = F) %>% 
+  add_header_above(c("", "N" = 2, "Overall" = 2, "Emotion \nRecognition" = 2, "Social \nPerspective-\nTaking" = 2,
+                     "Social \nProblem-\nSolving" = 2, "Self Control" = 2)) %>% 
+  column_spec(2:13, width = "0.8cm") 
+
+
+cat('\n\n\n\n')
+
+```
+
+

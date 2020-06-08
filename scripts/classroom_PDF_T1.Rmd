@@ -1,0 +1,101 @@
+---
+mainfont: Nunito
+font: Nunito
+fontsize: 14 pt
+output:
+  pdf_document:
+    latex_engine: xelatex
+    includes:
+      in_header: header.tex
+    keep_tex: false
+params: 
+  file_path: data
+  school_name: x
+  set_title: x
+  teacher_name: x
+geometry: "left=1in,right=1in,top=1in,bottom=0.6in"
+
+
+
+---
+
+```{r rmarkdown-setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(dev = "cairo_pdf")
+options(knitr.kable.NA = "")
+options(kableExtra.latex.load_packages = FALSE)
+
+```
+
+
+
+```{r setup, include=FALSE}
+
+# check to see if params$teacher_name actually tested in each time point
+if(params$teacher_name %in% district$TeacherLast){
+  teacher_1 <- subset(district, district$TeacherLast == params$teacher_name) 
+} else {
+teacher_1 <- data.frame()
+}
+
+
+
+if(dim(teacher_1)[1] >= 5 & mean(teacher_1$OverallScore, na.rm = T) != "NaN") {
+  class_for_plotting_1 <- prep_classroom_plots(teacher_1)
+} else {
+  class_for_plotting_1 <- data.frame()
+}
+
+```
+
+##  Classroom-level report for `r  params$teacher_name`
+
+This is a classroom-level report that shows student performance on SELweb EE in the classroom of `r params$teacher_name`. 
+The summary plot shows what proportion of students fall into each of the 4 competency levels based on national norms (above average, average, below average, and well-below average). The summary table shows standard scores for SELweb EE competencies for each student in this classrooom. 
+
+
+## Summary Plot for Classroom
+```{r setup-pdf, echo = FALSE, warning = FALSE, results = "asis"}
+
+n_class <- dim(subset(district, district$School == params$school_name & district$TeacherLast == params$teacher_name))[1]
+  
+if(dim(class_for_plotting_1)[1] > 0 ){
+  
+  make_summary_plot_pdf(class_for_plotting_1, params$teacher_name, n_class)
+} else {
+  print("Not enough data collected in Timepoint 2")
+  cat("\n\n\n")
+}
+ 
+cat(" \n\n\n")
+
+```
+Above average: $\geq$ 115; At or around average: 90-114; Below average: 70-89; Well below average: $\leq$ 69
+
+## Summary Table for Classroom
+```{r summary-table, echo = FALSE}
+
+if(length(teacher_1) > 0){
+  
+  student_data_for_table <- teacher_1 %>% 
+    arrange(LastName) %>% 
+    select("Student ID" = StudentID, Grade, "First Name" = FirstName, "Last Name" = LastName, "Overall" = OverallScore,
+           "Emotion Recognition" = ERScore, "Social Perspective-Taking" = SPTScore, "Social Problem-Solving" = SPSScore, "Self Control" = SCScore) %>% 
+    replace(is.na(.), "")
+  
+  ### Summary Scores by School
+  kable(student_data_for_table, "latex", booktabs = T, align = "lcllccccc", linesep = "") %>% 
+    kable_styling(latex_options = c("striped", "bordered"), full_width = F) %>% 
+    column_spec(2:9, width = "1.3cm") 
+}  else {
+  print("Not enough data collected in Timepoint 2")
+  cat("\n\n\n")
+}
+
+cat('\n\n\n\n')
+
+```
+

@@ -1,0 +1,101 @@
+---
+mainfont: Nunito
+font: Nunito
+fontsize: 14 pt
+output:
+  pdf_document:
+    latex_engine: xelatex
+    includes:
+      in_header: header.tex
+    keep_tex: false
+params: 
+  file_path: data
+  school_name: x
+  set_title: x
+geometry: "left=1in,right=1in,top=1in,bottom=0.6in"
+
+
+---
+
+```{r rmarkdown-setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(dev = "cairo_pdf")
+options(knitr.kable.NA = "")
+options(kableExtra.latex.load_packages = FALSE)
+
+```
+
+
+```{r setup, include=FALSE}
+
+school_rel <- district %>% 
+  filter(School == params$school_name) 
+
+teacher_links_1 <- make_teacher_links(school_rel,1)
+
+teacher_links_1_pdf <- teacher_links_1 %>%
+  mutate(Teacher = str_extract(Teacher, "(?<=\\>).+?(?=\\<)")) %>%
+  select(-1) %>% 
+  replace(is.na(.), "")
+
+
+school_for_plotting_1 <- prep_school_plots(district)
+
+#school_level_time1 <- teacher_links_1_pdf[teacher_links_1_pdf$School==params$school_name,2:9]
+
+grades_for_plotting_1 <- prep_grade_level_plots(district)
+
+```
+
+##  School-level report for `r  params$school_name`
+
+This is a school-level report that shows student performance on SELweb EE aggregated across `r params$school_name`. 
+The summary plot shows what proportion of students in`r params$school_name` fall into each of the 4 competency levels based on national norms (above average, average, below average, and well-below average). The summary table shows standard scores for SELweb EE competencies for each classroom within `r params$school_name`. 
+
+
+## Summary Plot for School
+```{r setup-pdf, echo = FALSE, warning = FALSE, results = "asis"}
+
+#source("/Volumes/GoogleDrive/My\ Drive/xSEL\ Labs/Scripts/Dashboards/flexdashboard/reports/2019-2020/PDF_Jan2020/make_summary_plot_function_pdf.R")
+
+
+n_school <- dim(subset(district, district$School == params$school_name))[1]
+
+if(n_school >= 5){
+  
+data_1 <- school_for_plotting_1[school_for_plotting_1$School==params$school_name,]
+
+#make_summary_plot(data_1, params$school_name, n_school)
+make_summary_plot_pdf(data_1, params$school_name, n_school)
+
+} else{
+  
+  print("Not enough data collected in Timepoint 1")
+}
+
+cat('\n\n\n\n')
+cat("  \n")  
+
+```
+Above average: $\geq$ 115; At or around average: 90-114; Below average: 70-89; Well below average: $\leq$ 69
+
+
+## Summary Table for School
+```{r summary-table, echo = FALSE}
+
+
+### Summary Scores by School
+kable(teacher_links_1_pdf, "latex", booktabs = T, align = "lccccccc", linesep = "") %>% 
+  kable_styling(latex_options = c("striped", "hold_position"), full_width = F) %>% 
+  column_spec(2:7, width = "2cm")
+
+
+cat('\n\n\n\n')
+
+```
+
+
+
