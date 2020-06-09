@@ -234,3 +234,4 @@ for (i in all_schools) {
   }
 }
 
+unlink("*.log")
