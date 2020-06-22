@@ -12,7 +12,8 @@ make_summary_table <- function(dataset, name){
     escape = FALSE, rownames = FALSE) %>%
     formatStyle(
       c("Overall Score","Emotion Recognition", "Social Perspective-Taking", "Social Problem-Solving","Self Control"),
-      backgroundColor = styleInterval(c(70, 90, 115), c('#006D2C', '#41AB5D','#A1D99B', '#E5F5E0'))
+      #backgroundColor = styleInterval(c(70, 90, 115), c('#006D2C', '#41AB5D','#A1D99B', '#d3f5c9#')) #E5F5E0'
+      backgroundColor = styleInterval(c(70, 90, 115), color_palette_dark_light) 
     )
 }
 

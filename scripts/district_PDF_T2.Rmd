@@ -54,6 +54,12 @@ data_for_plotting_2 <- transform_for_plotting(district_time2)
 ```
 
 
+##  District-level report for `r  district_name`, Timepoint 2
+
+This is a district-level report that shows student performance on SELweb EE in the `r district_name` district. 
+
+The summary plot shows what proportion of students in the `r district_name` district fall into each of the 4 performance levels (above average, average, below average, and well-below average). The summary table shows the average standard score of students in in each school in the `r district_name` district. See the attached appendix for more information about SELweb EE competencies, standard scores, and performance levels.
+
 ## Summary Plot for District
 ```{r setup-pdf, echo = FALSE, warning = FALSE, results = "asis"}
 
@@ -86,4 +92,4 @@ cat('\n\n\n\n')
 
 ```
 
-
+\includepdf[pages={-}]{report_appendix.pdf}

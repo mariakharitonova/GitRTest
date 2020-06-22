@@ -19,9 +19,6 @@ library(here)
 #### SET PARAMETERS HERE #######
 student_data_var = TRUE
 
-color_palette_dark_light = c('#006D2C', '#41AB5D', '#A1D99B', '#d3f5c9') #from darkest to lightest
-color_palette_light_dark = c("#d3f5c9", "#A1D99B","#41AB5D","#006D2C") #from lightest to darkest
-
 
 #### LOAD FUNCTIONS ######
 setwd(here("scripts", "functions", "EE"))
@@ -31,7 +28,7 @@ sapply(files.sources, FUN=source)
 #### CHANGE WD and LOAD DATA ######
 setwd("../..")
 
-data <- read_csv(here("data", "TE_EE_2017_18_fict_ID.csv"))
+data <- read_csv(here("data", "TE_EE_2017_18_fict_ID_shorter_T1T2_IDs_2schools.csv"))
 data <- subset(data, data$School != "NA") #remove NAs from school
 
 includeT2 <- (2 %in% data$Timepoint)

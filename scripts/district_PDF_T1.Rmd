@@ -26,8 +26,13 @@ knitr::opts_chunk$set(echo = FALSE)
 knitr::opts_chunk$set(message = FALSE)
 knitr::opts_chunk$set(warning = FALSE)
 knitr::opts_chunk$set(dev = "cairo_pdf")
+
+#knitr::opts_chunk$set(fig.path = here::here("figs"))
+
 options(knitr.kable.NA = "")
 options(kableExtra.latex.load_packages = FALSE)
+
+
 
 ```
 
@@ -53,9 +58,12 @@ data_for_plotting_1 <- transform_for_plotting(district)
 
 ```
 
-##  District-level report for `r  district_name`
+##  District-level report for `r  district_name`, Timepoint 1
 
-This is a district-level report that shows student performance on SELweb EE aggregated across `r district_name`. The summary plot shows what proportion of students in`r district_name` fall into each of the 4 competency levels based on national norms (above average, average, below average, and well-below average). The summary table shows standard scores for SELweb EE competencies for each school within `r district_name`. 
+This is a district-level report that shows student performance on SELweb EE in the `r district_name` district. 
+
+The summary plot shows what proportion of students in the `r district_name` district fall into each of the 4 performance levels (above average, average, below average, and well-below average). The summary table shows the average standard score of students in in each school in
+the `r district_name` district. See the attached appendix for more information about SELweb EE competencies, standard scores, and performance levels.
 
 ## Summary Plot for District
 ```{r setup-2, results = "asis"}
@@ -84,4 +92,4 @@ cat('\n\n\n\n')
 
 ```
 
-
+\includepdf[pages={-}]{report_appendix.pdf}

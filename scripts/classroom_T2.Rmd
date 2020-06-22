@@ -3,15 +3,7 @@ Timepoint 2  {data-icon="fa-table"}
 
 Row {data-height=650, .tabset .tabset-fade}
 -----------------------------------------------------------------------
-```{r}
 
-#prepare Timepoint 2 datasets
-
-
-
-
-
-```
 
 ### Summary plot for classroom
 

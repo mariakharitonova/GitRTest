@@ -44,8 +44,13 @@ school_common_1 <- district[(district$StudentID %in% common_students &
 school_common_2 <- district_time2[(district_time2$School == params$school_name & 
                                      district_time2$StudentID %in% common_students),]
 ```
+##  School-level report for `r  params$school_name`, Change Over Time
 
-## Change Over Time Plot 
+This is a school-level report that compares student performance on SELweb EE in `r params$school_name` across both timepoints (usually Spring vs Fall). Only the students who completed SELweb both times are included in this report. 
+
+The summary plot shows what proportion of students in the `r params$school_name` fall into each of the 4 performance levels at each timepoint. The summary table compares standard scores for SELweb EE competencies for students in each classroom in `r params$school_name`  across the two timepoints. See the attached appendix for more information about SELweb EE competencies, standard scores, and performance levels.
+
+## Summary Plot for School
 ```{r summary-plot, echo = FALSE, warning = FALSE}
 
 if(dim(school_common_1)[1] >=10 & dim(school_common_2)[1] >= 10){
@@ -78,7 +83,7 @@ cat("  \n")
 ```
 Above average: $\geq$ 115; At or around average: 90-114; Below average: 70-89; Well below average: $\leq$ 69
 
-## Summary Table for School: Timepoint 1 vs Timepoint 2
+## Summary Table for School
 ```{r summary-table, warning = FALSE, echo = FALSE}
 
 
@@ -101,3 +106,4 @@ cat('\n\n\n\n')
 
 ```
 
+\includepdf[pages={-}]{report_appendix.pdf}

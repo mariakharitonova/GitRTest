@@ -44,7 +44,13 @@ class_common_1 <- district[(district$StudentID %in% common_students &
 
 ```
 
-## Change Over Time Plot 
+##  Classroom-level report for `r params$teacher_name`, Change Over Time
+
+This is a classroom-level report that compares student performance on SELweb EE in `r params$teacher_name`'s classroom across both timepoints (usually Spring vs Fall). Only the students who completed SELweb both times are included in this report. 
+
+The summary plot shows what proportion of students in this classroom fall into each of the 4 performance levels at each timepoint. The summary table compares standard scores for SELweb EE competencies for each student in this classroom across the two timepoints. See the attached appendix for more information about SELweb EE competencies, standard scores, and performance levels.
+
+## Summary Plot for Classroom
 ```{r summary-plot, echo = FALSE, warning = FALSE, results = "asis"}
 
 if(dim(class_for_plotting_1)[1] >= 10 & dim(class_for_plotting_2)[1] >= 10){
@@ -71,7 +77,7 @@ cat("  \n")
 Above average: $\geq$ 115; At or around average: 90-114; Below average: 70-89; Well below average: $\leq$ 69
 
 
-## Summary Table for Classroom: Timepoint 1 vs Timepoint 2
+## Summary Table for Classroom
 ```{r summary-table, warning = FALSE, echo = FALSE, results = "asis"}
 
 if(dim(teacher_1)[1] >= 10 & dim(teacher_2)[1] >= 10){
@@ -102,3 +108,5 @@ kable(merged_student_links_pdf, "latex", booktabs = T, align = "lcllccccccccc", 
 cat('\n\n\n\n')
 
 ```
+
+\includepdf[pages={-}]{report_appendix.pdf}

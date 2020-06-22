@@ -58,9 +58,12 @@ student_comb$Timepoint <- as.factor(student_comb$Timepoint)
 
 ```
 
-##  Individual student report for `r  as.integer(params$student_id)`
-### Classroom: `r  params$teacher_name`, School: `r  params$school_name`
 
+
+
+##  Individual student report for `r  as.integer(params$student_id)`, Last Name: `r student_comb$LastName[1]`
+### School: `r  params$school_name`
+### Classroom: `r  params$teacher_name`
 
 ```{r plot, echo = FALSE, warning = FALSE, results = "asis"}
 
@@ -69,20 +72,20 @@ plot <- ggplot(data = student_comb, aes(x=variable, y = Score, ymin = 50, ymax =
   geom_point(aes(text = Score), color="black", fill = "black", size=3, position=position_dodge(0.5)) + 
   scale_shape_manual(values=dot_shape) + 
   geom_rect(aes(xmin = .5, xmax = 5.5, 
-                ymin = 50, ymax = 70, text = "Well-below"), fill = '#45874C', alpha = .1) +
+                ymin = 50, ymax = 70, text = "Well-below"), fill = color_palette_dark_light[1], alpha = .1) +
   geom_rect(aes(xmin = .5,xmax = 5.5,
-                ymin = 70, ymax = 90, text = "Below"), fill = '#86C17D', alpha = .1) +
+                ymin = 70, ymax = 90, text = "Below"), fill = color_palette_dark_light[2], alpha = .1) +
   geom_rect(aes(xmin = .5, xmax = 5.5,
-                ymin = 90, ymax = 115, text = "Average"), fill = '#C0E4B8', alpha = .1) + 
+                ymin = 90, ymax = 115, text = "Average"), fill = color_palette_dark_light[3], alpha = .1) + 
   geom_rect(aes(xmin = .5, xmax = 5.5,
-                ymin = 115, ymax = 150, text = "Above"), fill = '#EFF7EA', alpha = .1) +
+                ymin = 115, ymax = 150, text = "Above"), fill = color_palette_dark_light[4], alpha = .1) +
   geom_errorbar(aes(ymin=Score-CI_85, ymax=Score+CI_85), width=.1, colour="black", position=position_dodge(.5), alpha = .2) + 
   labs(y= "Score") + #, title=paste0(student_comb$District," - ", student_comb$School, " - ", student_comb$StudentID)
   theme(axis.title.x = element_blank(), 
-        text = element_text(size=7), panel.background = element_blank(),
+        text = element_text(size=10, family = "Nunito"), panel.background = element_blank(),
         axis.text.x = element_text(hjust = .5),
-        legend.title=element_text(size=6),
-        legend.text = element_text(size=6)) +
+        legend.title=element_text(size=9, family = "Nunito"),
+        legend.text = element_text(size=9, family = "Nunito")) +
   geom_text(aes(label = round(Score+CI_85, 0), y = Score+CI_85), vjust = -.5, size = 2, position=position_dodge(.5)) +
   geom_text(aes(label = round(Score-CI_85, 0), y = Score-CI_85), vjust = 1.5, size = 2, position=position_dodge(.5)) + 
   ylim(50, 150)
@@ -97,9 +100,24 @@ print(plot)
     # annotate("rect", xmin = .5,xmax = 5.5, ymin = 70, ymax = 90, fill = '#86C17D', alpha = .6) +
     # annotate("rect", xmin = .5, xmax = 5.5, ymin = 90, ymax = 115,fill = '#C0E4B8', alpha = .6) + 
     # annotate("rect", xmin = .5, xmax = 5.5, ymin = 115, ymax = 150, fill = '#EFF7EA', alpha = .6) +
+  
+  
+  
 
 ```
+<br>
+<br>
+<br>
+  
+This is a report of student’s performance on SELweb EE. Scores from different timepoints are represented by different symbols. 
+The report shows the student’s overall SELweb performance, as well as performance on each of the SELweb EE competencies.
 
+Scores on all assessments contain some uncertainty. That means that the score a student achieves on an assessment is an estimate of his or her true ability. The error bars indicate the range of scores within which the student’s true score is 85% likely to fall.
 
+Shades of green correspond to each of the 4 performance levels (ligher colors indicating higher performance).
+The attached appendix provides more information about SELweb EE competencies, standard scores, and
+performance levels.
+<br>
+<br>
 
-
+\includepdf[pages={-}]{report_appendix.pdf}

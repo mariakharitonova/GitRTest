@@ -54,6 +54,11 @@ school_level_time2 <- teacher_links_2_pdf
 grades_for_plotting_2 <- prep_grade_level_plots(district_time2)
 
 ```
+##  School-level report for `r  params$school_name`, Timepoint 2
+
+This is a school-level report that shows student performance on SELweb EE in `r params$school_name`.
+
+The summary plot shows what proportion of students in `r params$school_name` all into each of the 4 performance levels (above average, average, below average, and well-below average).The summary table shows the average standard score of students in in each classroom in `r params$school_name`. See the attached appendix for more information about SELweb EE competencies, standard scores, and performance levels. 
 
 
 ## Summary Plot for School
@@ -73,7 +78,7 @@ make_summary_plot_pdf(data_for_plotting_2, params$school_name, n_school_2)
 
 } else{
   
-  print("Not enough data collected in Timepoint 1")
+  print("Not enough data collected in Timepoint 2")
 }
 
 cat('\n\n\n\n')
@@ -96,5 +101,5 @@ cat('\n\n\n\n')
 
 ```
 
-
+\includepdf[pages={-}]{report_appendix.pdf}
 

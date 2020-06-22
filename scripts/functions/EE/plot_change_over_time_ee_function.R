@@ -19,7 +19,8 @@ plot_change_over_time_ee <- function(dataset, name, n){
           legend.text=element_text(size=10),
           strip.text = element_text(size=10), plot.title = element_text(hjust = 0.5, size=15),
           plot.margin = unit(c(15, 10, 10, 10), "mm")) + 
-    scale_fill_brewer(palette="Greens") +
+    #scale_fill_brewer(palette="Greens") +
+    scale_fill_manual(values = color_palette_light_dark) +
     #scale_fill_manual(values = c("#006D2C", "#41AB5D", "#A1D99B", "#E5F5E0")) + 
     geom_text(data=subset(dataset, percent>0),
               aes(label = paste0(round(percent,0),"%")), position =

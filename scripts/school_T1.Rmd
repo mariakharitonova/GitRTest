@@ -262,10 +262,10 @@ colnames(color_code) <- c("Well below average", "Below average", "At or around a
 datatable(color_code, options = list(
   dom = 't', columnDefs = list(list(width = '120px', className = 'dt-center', targets = 0:3))), 
           caption = "Legend for color coding", rownames = FALSE)  %>%
-  formatStyle('Well below average',  backgroundColor = '#45874C', fontWeight = 'bold') %>%
-  formatStyle('Below average',  backgroundColor = '#86C17D', fontWeight = 'bold') %>%
-  formatStyle('At or around average',  backgroundColor = '#C0E4B8', fontWeight = 'bold') %>%
-  formatStyle('Above average',  backgroundColor = '#EFF7EA', fontWeight = 'bold')
+  formatStyle('Well below average',  backgroundColor = color_palette_dark_light[1], fontWeight = 'bold') %>%
+  formatStyle('Below average',  backgroundColor = color_palette_dark_light[2], fontWeight = 'bold') %>%
+  formatStyle('At or around average',  backgroundColor = color_palette_dark_light[3], fontWeight = 'bold') %>%
+  formatStyle('Above average',  backgroundColor = color_palette_dark_light[4], fontWeight = 'bold')
   
 
 ```

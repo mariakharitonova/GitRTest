@@ -51,10 +51,11 @@ if(dim(teacher_1)[1] >= 5 & mean(teacher_1$OverallScore, na.rm = T) != "NaN") {
 
 ```
 
-##  Classroom-level report for `r  params$teacher_name`
+##  Classroom-level report for `r  params$teacher_name`, Timepoint 1
 
-This is a classroom-level report that shows student performance on SELweb EE in the classroom of `r params$teacher_name`. 
-The summary plot shows what proportion of students fall into each of the 4 competency levels based on national norms (above average, average, below average, and well-below average). The summary table shows standard scores for SELweb EE competencies for each student in this classrooom. 
+This is a classroom-level report for student performance on SELweb EE in `r params$teacher_name`'s classroom. 
+
+The summary plot shows what proportion of students fall into each of the 4 performance levels (above average, average, below average, and well-below average). The summary table shows standard scores for SELweb EE competencies for each student in this classroom. See the attached appendix for more information about SELweb EE competencies, standard scores, and performance levels. 
 
 
 ## Summary Plot for Classroom
@@ -99,3 +100,4 @@ cat('\n\n\n\n')
 
 ```
 
+\includepdf[pages={-}]{report_appendix.pdf}

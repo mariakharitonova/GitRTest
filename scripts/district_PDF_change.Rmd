@@ -32,7 +32,7 @@ options(kableExtra.latex.load_packages = FALSE)
 
 
 ```{r setup, include=FALSE}
-source("/Volumes/GoogleDrive/My\ Drive/xSEL\ Labs/Scripts/Dashboards/flexdashboard/functions/EE/plot_change_over_time_ee_function_pdf.R")
+#source("/Volumes/GoogleDrive/My\ Drive/xSEL\ Labs/Scripts/Dashboards/flexdashboard/functions/EE/plot_change_over_time_ee_function_pdf.R")
   
 common_students <- intersect(district$StudentID, district_time2$StudentID)
 
@@ -45,7 +45,13 @@ district_common_2 <- district_time2[(district_time2$StudentID %in% common_studen
 
 ```
 
+##  District-level report for `r  district_name`, Change Over Time
 
+This is a district-level report that compares student performance on SELweb EE in the `r district_name` district across both timepoints (usually Spring vs Fall). Only the students who completed SELweb both times are included in this report. 
+
+The summary plot shows what proportion of students in the `r district_name` district fall into each of the 4 performance levels at each timepoint. The summary table compares standard scores for SELweb EE competencies for students in each school in the `r district_name` district across the two timepoints. See the attached appendix for more information about SELweb EE competencies, standard scores, and performance levels.
+
+## Summary Plot for District
 ```{r summary-plot, echo = FALSE, warning = FALSE}
 
 district_time1_plotting <- transform_for_plotting(district_common_1)
@@ -68,7 +74,7 @@ cat("  \n")
 ```
 Above average: $\geq$ 115; At or around average: 90-114; Below average: 70-89; Well below average: $\leq$ 69
 
-## Summary Table for District: Timepoint 1 vs Timepoint 2
+## Summary Table for District
 ```{r summary-table, warning = FALSE, echo = FALSE}
 
 
@@ -91,4 +97,4 @@ cat('\n\n\n\n')
 
 ```
 
-
+\includepdf[pages={-}]{report_appendix.pdf}

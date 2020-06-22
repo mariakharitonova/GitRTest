@@ -24,7 +24,8 @@ make_summary_plot_pdf <- function(dataset, name, n){
           legend.text=element_text(size=8),
           plot.title = element_text(hjust = 0.5, size=10)) +
           #plot.title = element_text(hjust = 0, size=11, face="bold")) + 
-    scale_fill_brewer(palette="Greens") +
+    scale_fill_manual(values = color_palette_light_dark) +
+    #scale_fill_brewer(palette="Greens") +
     #scale_fill_manual(values=c("steelblue4", "darkolivegreen3", "lightgoldenrod2","tomato3")) +
     geom_text(data=subset(dataset, percent>0),
               aes(label = paste0(round(percent,0),"%")), position =
