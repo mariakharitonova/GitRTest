@@ -1,10 +1,10 @@
-prep_classroom_plots <- function(dataset){
+prep_classroom_plots_le <- function(dataset){
   #step 1: melt
-  school_melted <- melt(dataset, id.vars = c("Teacher"), measure.vars = 
+  school_melted <- melt(dataset, id.vars = c("TeacherLast"), measure.vars = 
                           c("SEL.SS.cat", "UO.SS.cat", "SPS.SS.cat", "SC.SS.cat"),na.rm=T)
   
   #step 2: summarize
-  school_plot_byTeacher <- dcast(school_melted, formula = Teacher + value + variable ~ ..., fun = length)
+  school_plot_byTeacher <- dcast(school_melted, formula = TeacherLast + value + variable ~ ..., fun = length)
   
   #rename header
   names(school_plot_byTeacher) <- c("Teacher", "category","module","count")

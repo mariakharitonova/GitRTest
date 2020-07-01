@@ -1,10 +1,11 @@
 ---
 params: 
   file_path: x
-  school_name: x
+  school_name: "Momentous School"
   set_title: x
   student_data: x
   includeT2: x
+  version: x
 title: "`r params$set_title`"
 
      
@@ -17,18 +18,22 @@ title: "`r params$set_title`"
 
 
 #a function that creates a table where each row is a TEACHER
+if(version == "EE"){
+  #create tables for each time point (each row = TEACHER)
+  teacher_links_1 <- make_teacher_links(district[district$School==params$school_name,],1)
+  school_for_plotting_1 <- prep_school_plots(district)
+  grades_for_plotting_1 <- prep_grade_level_plots(district)
+  school_level_time1 <- teacher_links_1[teacher_links_1$School==params$school_name,2:9]
 
-#create tables for each time point (each row = TEACHER)
-teacher_links_1 <- make_teacher_links(district[district$School==params$school_name,],1)
+} else if(version == "LE"){
+  teacher_links_1 <- make_teacher_links_le(district[district$School==params$school_name,],1)
+  school_for_plotting_1 <- prep_school_plots_le(district)
+  grades_for_plotting_1 <- prep_grade_level_plots_le(district)
+  school_level_time1 <- teacher_links_1[teacher_links_1$School==params$school_name,2:8]
+}
 
 
 
-school_for_plotting_1 <- prep_school_plots(district)
-
-school_level_time1 <- teacher_links_1[teacher_links_1$School==params$school_name,2:9]
-
- 
-grades_for_plotting_1 <- prep_grade_level_plots(district)
 
 
 ```
@@ -44,8 +49,11 @@ Row {data-height=650, .tabset .tabset-fade}
 
 ### Summary Scores for School by Classroom
 ```{r}
-
-make_summary_table(teacher_links_1[,2:ncol(teacher_links_1)], params$school_name)
+if(version == "EE"){
+  make_summary_table(teacher_links_1[,2:ncol(teacher_links_1)], params$school_name)
+} else if(version == "LE"){
+  make_summary_table_le(teacher_links_1[,2:ncol(teacher_links_1)], params$school_name)
+}
 
 ``` 
 
@@ -57,10 +65,12 @@ make_summary_table(teacher_links_1[,2:ncol(teacher_links_1)], params$school_name
 n_school <- dim(subset(district, district$School == params$school_name))[1]
 
 if(n_school >= 5){
-  
-data_1 <- school_for_plotting_1[school_for_plotting_1$School==params$school_name,]
 
-make_summary_plot(data_1, params$school_name, n_school)
+  data_1 <- school_for_plotting_1[school_for_plotting_1$School==params$school_name,]
+  make_summary_plot(data_1, params$school_name, n_school)
+
+
+
 } else{
   
   print("Not enough data collected in Timepoint 1")
@@ -198,9 +208,13 @@ if(params$student_data == TRUE) {
 if(n_school > 0){
   
   #prep data for student-level table (with links to individual student reports)
-  student_links_school_1 <- make_student_links_school_pdf(school_rel,1)
-  
-  make_student_level_table_links(student_links_school_1)
+  if(version == "EE"){
+    student_links_school_1 <- make_student_links_school_pdf(school_rel,1)
+    make_student_level_table_links(student_links_school_1)
+  } else if(version == "LE"){
+    student_links_school_1 <- make_student_links_school_pdf_le(school_rel,1)
+    make_student_level_table_links_le(student_links_school_1)
+  }
   
   
   # student_level <- district[district$School == params$school_name, c("StudentID", "Timepoint", "Language", "Grade", "LastName", "OverallScore", "ERScore", "SPTScore", "SPSScore", "SCScore")]
@@ -228,24 +242,26 @@ xfun::embed_file(pdf_schools_1)
 
 ```
 
-Glossary {data-icon="fa-question"}
+`r if(!params$version =="EE") {"\\begin{comment}"}`
+
+Glossary EE {data-icon="fa-question"}
 =====================================  
-* ![](/Volumes/GoogleDrive/My\ Drive/xSEL\ Labs/Scripts/Dashboards/Icons/Emotion\ Recognition\ Icon_smaller.png)
+* ![](./icons/Emotion\ Recognition\ Icon_smaller.png)
 **Emotion Recognition**:  
 Emotion recognition involves the ability to understand what others are feeling from their behavior. In everyday interactions, facial    expressions communicate what a person is feeling. For SELweb’s emotion recognition assessment, children see pictures of faces and indicate what each person is feeling. Some of the faces have very clear expressions; others are subtler. The more faces a child correctly labels, the higher their score.
 
 
-* ![](/Volumes/GoogleDrive/My\ Drive/xSEL\ Labs/Scripts/Dashboards/Icons/Social\ perspective-taking_smaller.png)
+* ![](./icons/Social\ perspective-taking_smaller.png)
 **Social Perspective-Taking**:   
 Social perspective-taking involves the ability to understand what someone else is thinking or intends, even when it is not obvious. For SELweb’s perspective-taking assessment, children listen to brief illustrated and narrated stories and answer questions about a story character’s actions. Getting the right answer requires them to understand the character’s underlying intentions. The more questions they answer right, the higher their score.
     
   
-* ![](/Volumes/GoogleDrive/My\ Drive/xSEL\ Labs/Scripts/Dashboards/Icons/Problem-Solving_smaller.png)
+* ![](./icons/Problem-Solving_smaller.png)
 **Social Problem-Solving**:   
 Social problem-solving involves the ability to solve challenging everyday social problems. For SELweb’s social problem-solving assessment, students listen to brief illustrated and narrated stories about challenging situations. After each story, they answer questions about their interpretations, goals, and actions
   
     
-* ![](/Volumes/GoogleDrive/My\ Drive/xSEL\ Labs/Scripts/Dashboards/Icons/Self-Control\ Icon_smaller.png)
+* ![](./icons/Self-Control\ Icon_smaller.png)
 **Self Control**:  
 Self-control includes the skills children use to control their attention, emotions, and behavior to achieve their goals. Two SELweb assessments measure different dimensions of self-control. One measures children’s ability to delay gratification and another measures their tolerance for frustration. Each child’s overall Self- Control score reflects the extent to which they score high on those two assessments.
     
@@ -269,3 +285,51 @@ datatable(color_code, options = list(
   
 
 ```
+
+`r {"\\end{comment}"}`
+
+
+`r if(!params$version == "LE") {"\\begin{comment}"}`
+
+Glossary LE {data-icon="fa-question"}
+=====================================  
+* ![](./icons/Emotion\ Recognition\ Icon_smaller.png)
+**Overall SEL**:  
+This score is a composite overall score that reflects children’s understanding of others complex emotions and perspectives, social problem-solving skills, and self-control. 
+
+
+* ![](./icons/Social\ perspective-taking_smaller.png)
+**Understanding Others**:   
+This score reflects children’s understanding that others can have mixed and complex social emotions (such as pride and embarrassment) and their understanding of others’ perspectives.
+
+
+* ![](./icons/Problem-Solving_smaller.png)
+**Social Problem-Solving**:   
+This score reflects children’s ability to think through challenging social problems. Higher scores reflect a preference for prosocial goals and solutions, and the ability to predict the consequences of prosocial solutions. 
+
+
+* ![](./icons/Self-Control\ Icon_smaller.png)
+**Self Control**:  
+This score is a composite overall score that reflects children’s understanding of others complex emotions and perspectives, social problem-solving skills, and self-control. 
+
+```{r}
+categories <- c("Well below average", "Below average", "At or around average", "Above average")
+values <- c("< 70", "70-89", "90-115", "> 115")
+
+color_code <- as.data.frame(rbind(categories, values))
+color_code <- color_code[2,]
+colnames(color_code) <- c("Well below average", "Below average", "At or around average", "Above average")
+
+datatable(color_code, options = list(
+  dom = 't', columnDefs = list(list(width = '120px', className = 'dt-center', targets = 0:3))), 
+          caption = "Legend for color coding", rownames = FALSE)  %>%
+  formatStyle('Well below average',  backgroundColor = color_palette_dark_light[1], fontWeight = 'bold') %>%
+  formatStyle('Below average',  backgroundColor = color_palette_dark_light[2], fontWeight = 'bold') %>%
+  formatStyle('At or around average',  backgroundColor = color_palette_dark_light[3], fontWeight = 'bold') %>%
+  formatStyle('Above average',  backgroundColor = color_palette_dark_light[4], fontWeight = 'bold')
+  
+#`r {"\\end{comment_le}"}`
+```
+
+`r {"\\end{comment}"}`
+

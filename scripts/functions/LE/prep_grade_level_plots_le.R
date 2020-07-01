@@ -1,8 +1,9 @@
-prep_grade_level_plots <- function(dataset){    
+prep_grade_level_plots_le <- function(dataset){    
   #for the by grade plot:
   
   #step 1: melt
-  school_grade_melted <- melt(dataset, id.vars = c("School", "Grade"), measure.vars =  c("SEL.SS.cat", "UO.SS.cat", "SPS.SS.cat", "SC.SS.cat"),na.rm=T)
+  school_grade_melted <- melt(dataset, id.vars = c("School", "Grade"), 
+                              measure.vars =  c("SEL.SS.cat", "UO.SS.cat", "SPS.SS.cat", "SC.SS.cat"),na.rm=T)
   
   #step 2: summarize
   school_grade_plot <- dcast(school_grade_melted, formula = School + Grade + value + variable ~ ..., fun = length)
@@ -54,7 +55,8 @@ prep_grade_level_plots <- function(dataset){
   
   
   #give full descriptions to each category 
-  school_grade_plot$category <- factor(school_grade_plot$category, levels = c("above","meets","below","well-below"), labels = c("Above (>=115)","Meets (90-114)", "Below (70-89)", "Well Below Expectations (<=69)"))
+  school_grade_plot$category <- factor(school_grade_plot$category, levels = c("above","meets","below","well-below"), 
+                                       labels = c("Above average","At or around average", "Below average", "Well below average"))
   
   return(school_grade_plot)
 }

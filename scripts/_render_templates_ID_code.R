@@ -1,4 +1,5 @@
-#rm(list = ls())
+## EE and LE Integrated test
+
 library(data.table)
 library(flexdashboard)
 library(ggplot2)
@@ -19,19 +20,31 @@ library(here)
 #### SET PARAMETERS HERE #######
 student_data_var = TRUE
 
+version <- "EE"
+datafile <- "TE_EE_2017_18_fict_ID_shorter_T1T2_IDs_2schools.csv"
+#datafile <- "Momentous_2020-06-11_le.csv"
+
 color_palette_dark_light = c('#006D2C', '#41AB5D', '#A1D99B', '#d3f5c9') #from darkest to lightest
 color_palette_light_dark = c("#d3f5c9", "#A1D99B","#41AB5D","#006D2C") #from lightest to darkest
 
 
 #### LOAD FUNCTIONS ######
-setwd(here("scripts", "functions", "EE"))
-files.sources = list.files(here("scripts", "functions", "EE"))
-sapply(files.sources, FUN=source)
+if(version == "EE"){
+  setwd(here("scripts", "functions", "EE"))
+  files.sources = list.files(here("scripts", "functions", "EE"))
+  sapply(files.sources, FUN=source)
+} else if(version == "LE"){
+  setwd(here("scripts", "functions", "LE"))
+  files.sources = list.files(here("scripts", "functions", "LE"))
+  sapply(files.sources, FUN=source)
+} else {
+  print("neither")
+}
 
 #### CHANGE WD and LOAD DATA ######
 setwd("../..")
 
-data <- read_csv(here("data", "TE_EE_2017_18_fict_ID.csv"))
+data <- read_csv(here("data", datafile))
 data <- subset(data, data$School != "NA") #remove NAs from school
 
 includeT2 <- (2 %in% data$Timepoint)
@@ -69,18 +82,18 @@ html_district_1 <- paste0(district_dir, district_name_nice,"_summary.html")
 #render PDF repots, one for each distrct, one for each school, one for each classroom
 rmarkdown::render("district_PDF_T1.Rmd", clean = TRUE,
                   output_file = pdf_district_1,
-                  params = list(file_path = data)) #, set_title =  paste0(district_name, " District, EE")
+                  params = list(file_path = data, version = version)) #, set_title =  paste0(district_name, " District, EE")
 
 
 if(includeT2 == TRUE){
   rmarkdown::render("district_PDF_T2.Rmd", clean = TRUE,
                     output_file = pdf_district_2,
-                    params = list(file_path = data))
+                    params = list(file_path = data, version = version))
 
   
   rmarkdown::render("district_PDF_change.Rmd", clean = TRUE,
                     output_file = pdf_district_change,
-                    params = list(file_path = data)) #, set_title =  paste0(district_name, " District, EE"
+                    params = list(file_path = data, version = version)) #, set_title =  paste0(district_name, " District, EE"
   
 }
 
@@ -92,8 +105,8 @@ rmarkdown::render("district_T1.Rmd", clean = TRUE,
                                  orientation = "rows",
                                  css= "styles.css"),
                   output_file = html_district_1,
-                  params = list(file_path = data, set_title = paste0(district_name, " District, EE"), 
-                                student_data = student_data_var, includeT2 = includeT2))
+                  params = list(file_path = data, set_title = paste0(district_name, " District, ", version), 
+                                student_data = student_data_var, includeT2 = includeT2, version = version))
 
 
 
@@ -126,16 +139,16 @@ for (i in all_schools) {
   
   rmarkdown::render("school_PDF_T1.Rmd",clean = TRUE,
                     output_file = pdf_schools_1,
-                    params = list(school_name = i, file_path = data))
+                    params = list(school_name = i, file_path = data, version = version))
   
   if(includeT2 == TRUE){
     rmarkdown::render("school_PDF_T2.Rmd", clean = TRUE,
                       output_file = pdf_schools_2,
-                      params = list(school_name = i, file_path = data))
+                      params = list(school_name = i, file_path = data, version = version))
     
     rmarkdown::render("school_PDF_change.Rmd", clean = TRUE,
                       output_file = pdf_schools_change,
-                      params = list(school_name = i, file_path = data))
+                      params = list(school_name = i, file_path = data, version = version))
     
   }
   
@@ -151,7 +164,8 @@ for (i in all_schools) {
                                        href = paste0("../../",district_name_nice,"_summary.html"),
                                      align = "right"))),
                     output_file = html_school_1,
-                    params = list(file_path = data, school_name = i, set_title = i, student_data = student_data_var, includeT2 = includeT2))
+                    params = list(file_path = data, school_name = i, set_title = i, student_data = student_data_var, 
+                                  includeT2 = includeT2, version = version))
 
   
   #all_classes <- unique(control_row$classID)
@@ -180,18 +194,20 @@ for (i in all_schools) {
   
     rmarkdown::render("classroom_PDF_T1.Rmd", clean = TRUE,
                       output_file = pdf_class_1,
-                      params = list(teacher_name = j, school_name = i, file_path = data))
+                      params = list(teacher_name = j, school_name = i, file_path = data, version = version))
     
     
     if(includeT2 == TRUE){
       rmarkdown::render("classroom_PDF_T2.Rmd", clean = TRUE,
                         output_file = pdf_class_2,
-                        params = list(teacher_name = j, school_name = i, file_path = data, set_title =  paste0(district_name, " District, EE")))
+                        params = list(teacher_name = j, school_name = i, file_path = data, version = version, 
+                                      set_title =  paste0(district_name, " District, EE")))
       
       
       rmarkdown::render("classroom_PDF_change.Rmd", clean = TRUE,
                         output_file = pdf_class_change,
-                        params = list(teacher_name = j, school_name = i, file_path = data, set_title =  paste0(district_name, " District, EE")))
+                        params = list(teacher_name = j, school_name = i, file_path = data, version = version,
+                                      set_title =  paste0(district_name, " District, EE")))
 
       
     }
@@ -210,7 +226,8 @@ for (i in all_schools) {
                                        align = "right"))),
                       output_file = html_class_1,
                       params = list(file_path = data, school_name = i, teacher_name = j,
-                                    set_title = paste0(j," (Classroom), ", i, " (School)"), student_data = student_data_var, includeT2 = includeT2))
+                                    set_title = paste0(j," (Classroom), ", i, " (School)"), 
+                                    student_data = student_data_var, includeT2 = includeT2, version = version))
     
     control_student <- student_xwalk[School == i & TeacherLast == j, ]
     all_students <- unique(control_student$StudentID)
@@ -228,7 +245,8 @@ for (i in all_schools) {
      
       rmarkdown::render("individual_report_time_pdf.Rmd", clean = TRUE,
                         output_file =  pdf_student,
-                        params = list(teacher_name = j, school_name = i, student_id = k, file_path = data))
+                        params = list(teacher_name = j, school_name = i, student_id = k, file_path = data,
+                                      version = version))
       
       
     }

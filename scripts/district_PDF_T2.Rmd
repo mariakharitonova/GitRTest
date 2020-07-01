@@ -12,6 +12,7 @@ params:
   file_path: data
   school_name: x
   set_title: x
+  version: x
 geometry: "left=1in,right=1in,top=1in,bottom=0.6in"
 
 
@@ -35,12 +36,17 @@ options(kableExtra.latex.load_packages = FALSE)
 #    vertical_layout: scroll
 
 #prepare Timepoint2 datasets
-district_time2 <- subset(ee_data, ee_data$School != "NA" & ee_data$Timepoint==2) 
+district_time2 <- subset(new_data, new_data$School != "NA" & new_data$Timepoint==2) 
 district_time2[] <- lapply(district_time2, function(x) {if (is.numeric(x)) round(x, 0) else x}) #round to whole number
 
-school_links_2 <- make_school_links(district_time2, 2)
+if(version == "EE"){
+  school_links_2 <- make_school_links(district_time2, 2)
+  data_for_plotting_2 <- transform_for_plotting(district_time2)
 
-data_for_plotting_2 <- transform_for_plotting(district_time2)
+} else if(version == "LE"){
+  school_links_2 <- make_school_links_le(district_time2, 2)
+  data_for_plotting_2 <- transform_for_plotting_le(district_time2)
+}
 
 
 school_links_2_pdf <- school_links_2 %>%
@@ -48,17 +54,14 @@ school_links_2_pdf <- school_links_2 %>%
   replace(is.na(.), "")
 
 
-#transform the data for summary plots
-data_for_plotting_2 <- transform_for_plotting(district_time2)
-
 ```
 
 
 ##  District-level report for `r  district_name`, Timepoint 2
 
-This is a district-level report that shows student performance on SELweb EE in the `r district_name` district. 
+This is a district-level report that shows student performance on SELweb `r  params$version` in the `r district_name` district. 
 
-The summary plot shows what proportion of students in the `r district_name` district fall into each of the 4 performance levels (above average, average, below average, and well-below average). The summary table shows the average standard score of students in in each school in the `r district_name` district. See the attached appendix for more information about SELweb EE competencies, standard scores, and performance levels.
+The summary plot shows what proportion of students in the `r district_name` district fall into each of the 4 performance levels (above average, average, below average, and well-below average). The summary table shows the average standard score of students in in each school in the `r district_name` district. See the attached appendix for more information about SELweb `r  params$version` competencies, standard scores, and performance levels.
 
 ## Summary Plot for District
 ```{r setup-pdf, echo = FALSE, warning = FALSE, results = "asis"}
@@ -66,9 +69,17 @@ The summary plot shows what proportion of students in the `r district_name` dist
 #source("/Volumes/GoogleDrive/My\ Drive/xSEL\ Labs/Scripts/Dashboards/flexdashboard/reports/2019-2020/PDF_Mar2020/make_summary_plot_function_pdf.R")
 
 
-n_district_2 <- length(district_time2$ERScore[!is.na(district_time2$ERScore)])
 
-make_summary_plot_pdf(data_for_plotting_2, district_name, n_district_2)
+if(version == "EE"){
+  n_district_2 <- length(district_time2$ERScore[!is.na(district_time2$ERScore)])
+  make_summary_plot_pdf(data_for_plotting_2, district_name, n_district_2)
+} else if(version == "LE"){
+  n_district_2 <- length(district_time2$UO.SS[!is.na(district_time2$UO.SS)])
+  make_summary_plot_pdf_le(data_for_plotting_2, district_name, n_district_2)
+
+}
+
+
 #paste0(district_name, " (N = ", n_district_2, ")")
 
 cat('\n\n\n\n')
@@ -92,4 +103,6 @@ cat('\n\n\n\n')
 
 ```
 
-\includepdf[pages={-}]{report_appendix.pdf}
+`r if(params$version =="EE") {"\\includepdf[pages={-}]{report_appendix.pdf}"}`
+`r if(params$version =="LE") {"\\includepdf[pages={-}]{report_appendix_le.pdf}"}`
+

@@ -1,4 +1,4 @@
-make_student_level_table <- function(dataset){
+make_student_level_table_le <- function(dataset){
   datatable(
     dataset,
     filter = 'top',

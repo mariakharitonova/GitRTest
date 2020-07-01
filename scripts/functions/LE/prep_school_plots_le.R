@@ -1,4 +1,4 @@
-prep_school_plots <- function(dataset){
+prep_school_plots_le <- function(dataset){
   
   #step 1: melt
   school_melted <- melt(dataset, id.vars = c("School"), measure.vars = 
@@ -44,7 +44,9 @@ prep_school_plots <- function(dataset){
   #levels(school_plot_byTeacher$module) <- gsub("  ", "\n",levels(school_plot_byTeacher$module))
   
   #give full descriptions to each category
-  school_plot$category <- factor(school_plot$category, levels = c("above","meets","below","well-below"), labels = c("Above (>=115)","Meets (90-114)", "Below (70-89)", "Well Below Expectations (<=69)"))
+  school_plot$category <- factor(school_plot$category, 
+                                 levels = c("above","meets","below","well-below"), 
+                                 labels = c("Above average","At or around average", "Below average", "Well below average"))
   
   return(school_plot)
   

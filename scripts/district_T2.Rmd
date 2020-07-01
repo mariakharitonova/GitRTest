@@ -9,7 +9,7 @@ Row
 ### Numbers of students who completed SELweb
 
 ```{r}
-valueBox(length(district_time2$overall.cat), icon = "fa-child")
+valueBox(length(district_time2$SEL.SS), icon = "fa-child")
 ```
 
 ### Numbers of schools that administered SELweb
@@ -26,8 +26,11 @@ Row {data-height=500, .tabset .tabset-fade}
 ### Summary Scores by School
 
 ```{r}
-
-make_summary_table(school_links_2, district_name)
+if(version == "EE"){
+  make_summary_table(school_links_2, district_name)
+} else if(version == "LE"){
+  make_summary_table_le(school_links_2, district_name)
+}
 
 ```
 
@@ -52,26 +55,22 @@ if(params$student_data == TRUE) {
 
 ```{r}
 
-# student_level_2 <- district_time2[,c("StudentID", "Timepoint", "Language", "Grade", "LastName", 
-#                              "School", "OverallScore", "ERScore", "SPTScore", "SPSScore", "SCScore")]
-#   #1:2, 4:7, 13, 16, 18, 20, 24, 27)]
-# names(student_level_2) <- c("Student ID", "Timepoint", "Language", "Grade", "Last Name", "School", "Overall Score", "Emotion Recognition", "Social Perspective-Taking", "Social Problem-Solving", "Self-Control")
-# 
-# make_student_level_table(student_level_2)
-
 
 #prep data for student-level table (with links to individual student reports)
-student_links_district_2 <- make_student_links_district_pdf(district_time2, 2)
-
-make_student_level_table_links(student_links_district_2)
-
+if(version == "EE"){
+  student_links_district_2 <- make_student_links_district_pdf(district_time2, 2)
+  make_student_level_table_links(student_links_district_2)
+} else if(version == "LE"){
+  student_links_district_2 <- make_student_links_district_pdf_le(district_time2, 2)
+  make_student_level_table_links_le(student_links_district_2)
+}
 ```
 
 ### PDF report
 ```{r}
-
 xfun::embed_file(pdf_district_2)
 ```
+
 
 Change Over Time {data-icon="fa-bar-chart"}
 =====================================  
@@ -89,8 +88,13 @@ common_students <- intersect(district$StudentID, district_time2$StudentID)
 district_common_1 <- district[(district$StudentID %in% common_students),]
 district_common_2 <- district_time2[(district_time2$StudentID %in% common_students),]
 
-district_time1_plotting <- transform_for_plotting(district_common_1)
-district_time2_plotting <- transform_for_plotting(district_common_2)
+if(version == "EE"){
+  district_time1_plotting <- transform_for_plotting(district_common_1)
+  district_time2_plotting <- transform_for_plotting(district_common_2)
+} else if(version== "LE"){
+  district_time1_plotting <- transform_for_plotting_le(district_common_1)
+  district_time2_plotting <- transform_for_plotting_le(district_common_2)
+}
 
 
 data_for_plotting_change_1 <- district_time1_plotting %>% 
@@ -101,8 +105,11 @@ data_for_plotting_change_2 <- district_time2_plotting %>%
 
 data_for_plotting_change <- rbind(data_for_plotting_change_1, data_for_plotting_change_2)
 
-
-plot_change_over_time_ee(data_for_plotting_change, district_name, dim(district_common_2)[1])
+if(version == "EE"){
+  plot_change_over_time_ee(data_for_plotting_change, district_name, dim(district_common_2)[1])
+} else if(version == "LE"){
+  plot_change_over_time_le(data_for_plotting_change, district_name, dim(district_common_2)[1])
+}
 
 
 

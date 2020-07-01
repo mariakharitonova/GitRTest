@@ -29,18 +29,14 @@ if(params$student_data == TRUE) {
 ```{r}
 if(dim(teacher_2)[1] > 0 ){
   
-  
-  #prep data for student-level table (with links to individual student reports)
-  student_links_class_2 <- make_student_links_pdf(teacher_2, 2)
-  
-  make_student_level_table_links(student_links_class_2)
-  
-  # 
-  # student_level_2 <- teacher_2[,c("StudentID", "Timepoint", "Language", "Grade", "LastName",
-  #                                 "OverallScore", "ERScore", "SPTScore", "SPSScore", "SCScore")]
-  # names(student_level_2) <- c("Student ID", "Timepoint", "Language", "Grade", "Last Name", "Overall Score", "Emotion Recognition", "Social Perspective-Taking", "Social Problem-Solving", "Self-Control")
-  # 
-  # make_student_level_table(student_level_2)
+  if(version == "EE"){
+    #prep data for student-level table (with links to individual student reports)
+    student_links_class_2 <- make_student_links_pdf(teacher_2, 2)
+    make_student_level_table_links(student_links_class_2)
+  } else if(version == "LE"){
+    student_links_class_2 <- make_student_links_pdf_le(teacher_2, 2)
+    make_student_level_table_links_le(student_links_class_2)
+  }
   
 } else {
   print("No data collected in Timepoint 2")
@@ -72,14 +68,17 @@ class_common <- district[(district$StudentID %in% common_students &
 if(dim(class_for_plotting_1)[1] >= 10 & dim(class_for_plotting_2)[1] >= 10){
   
   class_for_plotting_1 <- class_for_plotting_1 %>% 
-  mutate(Timepoint = "Fall")
+    mutate(Timepoint = "Fall")
 
   class_for_plotting_2 <- class_for_plotting_2 %>% 
     mutate(Timepoint = "Spring")
 
   data_class_change <- rbind(class_for_plotting_1, class_for_plotting_2)
-   
-  plot_change_over_time_ee(data_class_change, params$teacher_name, dim(class_common)[1])
+  if(version == "EE"){
+    plot_change_over_time_ee(data_class_change, params$teacher_name, dim(class_common)[1])
+  } else if(version== "LE"){
+    plot_change_over_time_le(data_class_change, params$teacher_name, dim(class_common)[1])
+  }
 } else {
   print("Not enough data collected at both time points (need at least 15 data points for both Fall and Spring)")
   

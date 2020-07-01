@@ -13,6 +13,7 @@ params:
   school_name: x
   set_title: x
   teacher_name: x
+  version: x
 geometry: "left=1in,right=1in,top=1in,bottom=0.6in"
 ---
 
@@ -30,7 +31,7 @@ options(kableExtra.latex.load_packages = FALSE)
 
 
 ```{r setup, include=FALSE}
-source("/Volumes/GoogleDrive/My\ Drive/xSEL\ Labs/Scripts/Dashboards/flexdashboard/functions/EE/plot_change_over_time_ee_function_pdf.R")
+#source("/Volumes/GoogleDrive/My\ Drive/xSEL\ Labs/Scripts/Dashboards/flexdashboard/functions/EE/plot_change_over_time_ee_function_pdf.R")
   
 #make datasets of overlapping students if a classrom completed SELweb at both points
 
@@ -46,9 +47,9 @@ class_common_1 <- district[(district$StudentID %in% common_students &
 
 ##  Classroom-level report for `r params$teacher_name`, Change Over Time
 
-This is a classroom-level report that compares student performance on SELweb EE in `r params$teacher_name`'s classroom across both timepoints (usually Spring vs Fall). Only the students who completed SELweb both times are included in this report. 
+This is a classroom-level report that compares student performance on SELweb `r params$version` in `r params$teacher_name`'s classroom across both timepoints (usually Spring vs Fall). Only the students who completed SELweb both times are included in this report. 
 
-The summary plot shows what proportion of students in this classroom fall into each of the 4 performance levels at each timepoint. The summary table compares standard scores for SELweb EE competencies for each student in this classroom across the two timepoints. See the attached appendix for more information about SELweb EE competencies, standard scores, and performance levels.
+The summary plot shows what proportion of students in this classroom fall into each of the 4 performance levels at each timepoint. The summary table compares standard scores for SELweb `r params$version` competencies for each student in this classroom across the two timepoints. See the attached appendix for more information about SELweb `r params$version` competencies, standard scores, and performance levels.
 
 ## Summary Plot for Classroom
 ```{r summary-plot, echo = FALSE, warning = FALSE, results = "asis"}
@@ -56,14 +57,17 @@ The summary plot shows what proportion of students in this classroom fall into e
 if(dim(class_for_plotting_1)[1] >= 10 & dim(class_for_plotting_2)[1] >= 10){
   
   class_for_plotting_1 <- class_for_plotting_1 %>% 
-  mutate(Timepoint = "Fall")
+    mutate(Timepoint = "Fall")
 
   class_for_plotting_2 <- class_for_plotting_2 %>% 
     mutate(Timepoint = "Spring")
 
   data_class_change <- rbind(class_for_plotting_1, class_for_plotting_2)
-   
-  plot_change_over_time_ee_pdf(data_class_change, params$teacher_name, dim(class_common_1)[1])
+  if(version == "EE"){
+    plot_change_over_time_ee_pdf(data_class_change, params$teacher_name, dim(class_common_1)[1])
+  } else if(version == "LE"){
+    plot_change_over_time_le_pdf(data_class_change, params$teacher_name, dim(class_common_1)[1])
+  }
 } else {
   
   print("Not enough data collected at both time points (need at least 10 data points for both Fall and Spring)")
@@ -81,24 +85,38 @@ Above average: $\geq$ 115; At or around average: 90-114; Below average: 70-89; W
 ```{r summary-table, warning = FALSE, echo = FALSE, results = "asis"}
 
 if(dim(teacher_1)[1] >= 10 & dim(teacher_2)[1] >= 10){
+  if(version == "EE"){
+    merged_student_links_pdf <- left_join(student_data_for_table, student_data_for_table_2, by = c("Student ID")) %>% 
+      rename(LastName = "Last Name.x") %>% 
+      arrange(LastName) %>% 
+      select("Student ID", "First Name" = "First Name.x", "Last Name" = LastName, Fall = "Overall.x", Spring = "Overall.y",
+             Fall = "Emotion Recognition.x", Spring = "Emotion Recognition.y", Fall = "Social Perspective-Taking.x",
+             Spring = "Social Perspective-Taking.y", Fall = "Social Problem-Solving.x", Spring = "Social Problem-Solving.y",
+             Fall = "Self Control.x", Spring = "Self Control.y") %>% 
+      replace(is.na(.), "") 
+    
+    kable(merged_student_links_pdf, "latex", booktabs = T, align = "lcllccccccccc", linesep = "") %>% 
+      kable_styling(latex_options = c("striped", "bordered"), full_width = F) %>% 
+      add_header_above(c("", "", "", "Overall" = 2, "Emotion \nRecognition" = 2, "Social \nPerspective-\nTaking" = 2,
+                         "Social \nProblem-\nSolving" = 2, "Self Control" = 2)) %>% 
+      column_spec(2:3, width = "1.7cm") %>% 
+      column_spec(4:13, width = "0.8cm")
 
-merged_student_links_pdf <- left_join(student_data_for_table, student_data_for_table_2, by = c("Student ID")) %>% 
-  rename(LastName = "Last Name.x") %>% 
-  arrange(LastName) %>% 
-  select("Student ID", "First Name" = "First Name.x", "Last Name" = LastName, Fall = "Overall.x", Spring = "Overall.y",
-         Fall = "Emotion Recognition.x", Spring = "Emotion Recognition.y", Fall = "Social Perspective-Taking.x",
-         Spring = "Social Perspective-Taking.y", Fall = "Social Problem-Solving.x", Spring = "Social Problem-Solving.y",
-         Fall = "Self Control.x", Spring = "Self Control.y") %>% 
-  replace(is.na(.), "") 
+  } else if(version == "LE"){
+    merged_student_links_pdf <- left_join(student_data_for_table, student_data_for_table_2, by = c("Student ID")) %>% 
+      rename(LastName = "Last Name.x") %>% 
+      arrange(LastName) %>% 
+      select("Student ID", "First Name" = "First Name.x", "Last Name" = LastName, Fall = "Overall.x", Spring = "Overall.y",
+             Fall = "Understanding Others.x", Spring = "Understanding Others.x", Fall = "Social Problem-Solving.x", Spring = "Social Problem-Solving.y",  Fall = "Self Control.x", Spring = "Self Control.y") %>% 
+      replace(is.na(.), "") 
+    
+    kable(merged_student_links_pdf, "latex", booktabs = T, align = "lcllcccccccc", linesep = "") %>% 
+      kable_styling(latex_options = c("striped", "bordered"), full_width = F) %>% 
+      add_header_above(c("", "", "", "Overall" = 2, "Understanding \nOthers" = 2, "Social \nProblem-\nSolving" = 2, "Self Control" = 2)) %>% 
+      column_spec(2:3, width = "1.7cm") %>% 
+      column_spec(4:12, width = "0.8cm")
+  }
 
-
-### Summary Scores by School
-kable(merged_student_links_pdf, "latex", booktabs = T, align = "lcllccccccccc", linesep = "") %>% 
-  kable_styling(latex_options = c("striped", "bordered"), full_width = F) %>% 
-  add_header_above(c("", "", "", "Overall" = 2, "Emotion \nRecognition" = 2, "Social \nPerspective-\nTaking" = 2,
-                     "Social \nProblem-\nSolving" = 2, "Self Control" = 2)) %>% 
-  column_spec(2:3, width = "1.7cm") %>% 
-  column_spec(4:13, width = "0.8cm")
 
 } else {
   print("Not enough data collected at both time points (need at least 10 data points for both Fall and Spring)")
@@ -109,4 +127,5 @@ cat('\n\n\n\n')
 
 ```
 
-\includepdf[pages={-}]{report_appendix.pdf}
+`r if(params$version =="EE") {"\\includepdf[pages={-}]{report_appendix.pdf}"}`
+`r if(params$version =="LE") {"\\includepdf[pages={-}]{report_appendix_le.pdf}"}`

@@ -54,7 +54,8 @@ prep_grade_level_plots <- function(dataset){
   
   
   #give full descriptions to each category 
-  school_grade_plot$category <- factor(school_grade_plot$category, levels = c("above","meets","below","well-below"), labels = c("Above average (>=115)","At or around average (90-114)", "Below average (70-89)", "Well below average (<=69)"))
+  school_grade_plot$category <- factor(school_grade_plot$category, levels = c("above","meets","below","well-below"), 
+                                       labels = c("Above average","At or around average", "Below average", "Well below average"))
   
   return(school_grade_plot)
 }

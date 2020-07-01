@@ -1,6 +1,6 @@
-calculate_CI_ee <- function(){
+calculate_CI_le <- function(){
  ci_table <- tibble(
-   variable = c("OverallScore", "UOScore", "SPSScore", "SCScore"),
+   variable = c("SEL.SS", "UO.SS", "SPS.SS", "SC.SS"),
    alpha = c(0.87, 0.80, 0.8, 0.8)   #the reliabilities for LE modules 
  )
   

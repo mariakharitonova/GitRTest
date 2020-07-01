@@ -1,5 +1,5 @@
 #add categorical variables (above, meets, etc.)
-add_cat_vars <- function(datafile) {
+add_cat_vars_le <- function(datafile) {
   
   datafile$SEL.SS.cat <- ifelse(datafile[,"SEL.SS"] >= 115, "above", 
                                 ifelse((datafile[,"SEL.SS"] < 115 & datafile[,"SEL.SS"] >= 90), "meets",

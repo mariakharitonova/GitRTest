@@ -1,5 +1,5 @@
 #transform the data for summary plots
-transform_for_plotting <- function(datafile){
+transform_for_plotting_le <- function(datafile){
   
   #step 1: melt
   district_melted <- melt(datafile, id.vars = c("District"), measure.vars = 

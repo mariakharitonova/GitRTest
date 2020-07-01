@@ -11,6 +11,7 @@ output:
 params: 
   file_path: data
   school_name: x
+  version: x
   set_title: x
 geometry: "left=1in,right=1in,top=1in,bottom=0.6in"
 
@@ -37,7 +38,11 @@ options(kableExtra.latex.load_packages = FALSE)
 school_rel_2 <- district_time2 %>% 
   filter(School == params$school_name) 
 
-teacher_links_2 <- make_teacher_links(school_rel_2,2)
+if(version == "EE"){
+  teacher_links_2 <- make_teacher_links(school_rel_2,2)
+} else if(version == "LE"){
+   teacher_links_2 <- make_teacher_links_le(school_rel_2,2)
+}
 
 
 teacher_links_2_pdf <- teacher_links_2 %>%
@@ -45,20 +50,22 @@ teacher_links_2_pdf <- teacher_links_2 %>%
   select(-1) %>% 
   replace(is.na(.), "")
 
-
-school_for_plotting_2 <- prep_school_plots(district_time2)
-
 school_level_time2 <- teacher_links_2_pdf
 
-
-grades_for_plotting_2 <- prep_grade_level_plots(district_time2)
+if(version == "EE"){
+  school_for_plotting_2 <- prep_school_plots(district_time2)
+  grades_for_plotting_2 <- prep_grade_level_plots(district_time2)
+} else if(version == "LE"){
+  school_for_plotting_2 <- prep_school_plots_le(district_time2)
+  grades_for_plotting_2 <- prep_grade_level_plots_le(district_time2)
+}
 
 ```
 ##  School-level report for `r  params$school_name`, Timepoint 2
 
-This is a school-level report that shows student performance on SELweb EE in `r params$school_name`.
+This is a school-level report that shows student performance on SELweb `r  params$version` in `r params$school_name`.
 
-The summary plot shows what proportion of students in `r params$school_name` all into each of the 4 performance levels (above average, average, below average, and well-below average).The summary table shows the average standard score of students in in each classroom in `r params$school_name`. See the attached appendix for more information about SELweb EE competencies, standard scores, and performance levels. 
+The summary plot shows what proportion of students in `r params$school_name` all into each of the 4 performance levels (above average, average, below average, and well-below average).The summary table shows the average standard score of students in in each classroom in `r params$school_name`. See the attached appendix for more information about SELweb `r  params$version` competencies, standard scores, and performance levels. 
 
 
 ## Summary Plot for School
@@ -70,11 +77,13 @@ The summary plot shows what proportion of students in `r params$school_name` all
 n_school_2 <- dim(subset(district_time2, district_time2$School == params$school_name))[1]
 
 if(n_school_2 >= 5){
-  
-data_2 <- school_for_plotting_2[school_for_plotting_2$School==params$school_name,]
-
-#make_summary_plot(data_1, params$school_name, n_school)
-make_summary_plot_pdf(data_for_plotting_2, params$school_name, n_school_2)
+  data_2 <- school_for_plotting_2[school_for_plotting_2$School==params$school_name,]
+  if(version == "EE"){
+    #make_summary_plot(data_1, params$school_name, n_school)
+    make_summary_plot_pdf(data_for_plotting_2, params$school_name, n_school_2)
+  } else if(version == "LE"){
+    make_summary_plot_pdf_le(data_for_plotting_2, params$school_name, n_school_2)
+  }
 
 } else{
   
@@ -101,5 +110,7 @@ cat('\n\n\n\n')
 
 ```
 
-\includepdf[pages={-}]{report_appendix.pdf}
+`r if(params$version =="EE") {"\\includepdf[pages={-}]{report_appendix.pdf}"}`
+`r if(params$version =="LE") {"\\includepdf[pages={-}]{report_appendix_le.pdf}"}`
+
 

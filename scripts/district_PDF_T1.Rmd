@@ -12,6 +12,7 @@ params:
   file_path: data
   school_name: x
   set_title: x
+  version: х
 geometry: "left=1in,right=1in,top=1in,bottom=0.6in"
 
 
@@ -38,39 +39,59 @@ options(kableExtra.latex.load_packages = FALSE)
 
 ```{r rmarkdown-prep, include=FALSE}
 #add categorical variables (above, meets, etc.)
-ee_data <- add_cat_vars(data)
+if(params$version == "EE"){
+  new_data <- add_cat_vars(data)
+} else if(params$version == "LE"){
+  new_data <- add_cat_vars_le(data)
+} else {
+  print("undefined vesion")
+}
 
 #divide data into 2 timepoints
-district <- subset(ee_data, ee_data$Timepoint==1) #remove NAs from school
+district <- subset(new_data, new_data$Timepoint==1) #remove NAs from school
 district[] <- lapply(district, function(x) {if (is.numeric(x)) round(x, 0) else x}) #round to whole number
 
 
 #create tables for each time point (each row = SCHOOL)
-school_links_1 <- make_school_links(district, 1)
+if(version == "EE"){
+  school_links_1 <- make_school_links(district, 1)
+  data_for_plotting_1 <- transform_for_plotting(district)
+
+} else if(version == "LE"){
+  school_links_1 <- make_school_links_le(district, 1)
+  data_for_plotting_1 <- transform_for_plotting_le(district)
+}
+
 
 school_links_1_pdf <- school_links_1 %>%
   mutate(School = str_extract(School, "(?<=\\>).+?(?=\\<)")) %>% 
   replace(is.na(.), "")
 
 
-#transform the data for summary plots
-data_for_plotting_1 <- transform_for_plotting(district)
 
 ```
 
 ##  District-level report for `r  district_name`, Timepoint 1
 
-This is a district-level report that shows student performance on SELweb EE in the `r district_name` district. 
+This is a district-level report that shows student performance on SELweb `r  params$version` in the `r district_name` district. 
 
 The summary plot shows what proportion of students in the `r district_name` district fall into each of the 4 performance levels (above average, average, below average, and well-below average). The summary table shows the average standard score of students in in each school in
-the `r district_name` district. See the attached appendix for more information about SELweb EE competencies, standard scores, and performance levels.
+the `r district_name` district. See the attached appendix for more information about SELweb `r  params$version` competencies, standard scores, and performance levels.
 
 ## Summary Plot for District
 ```{r setup-2, results = "asis"}
 
-n_district <- length(district$ERScore[!is.na(district$ERScore)])
+if(version == "EE"){
+  n_district <- length(district$ERScore[!is.na(district$ERScore)])
+  make_summary_plot_pdf(data_for_plotting_1, district_name, n_district)
+} else if(version == "LE"){
+  n_district <- length(district$UO.SS[!is.na(district$UO.SS)])
+  make_summary_plot_pdf_le(data_for_plotting_1, district_name, n_district)
 
-make_summary_plot_pdf(data_for_plotting_1, district_name, n_district)
+}
+
+
+
 
 cat('\n\n\n\n')
 cat(' \n')
@@ -90,6 +111,10 @@ kable(school_links_1_pdf, "latex", booktabs = T, align = "lccccccc", linesep = "
 
 cat('\n\n\n\n')
 
+#\includepdf[pages={-}]{report_appendix.pdf}
 ```
 
-\includepdf[pages={-}]{report_appendix.pdf}
+`r if(params$version =="EE") {"\\includepdf[pages={-}]{report_appendix.pdf}"}`
+`r if(params$version =="LE") {"\\includepdf[pages={-}]{report_appendix_le.pdf}"}`
+
+

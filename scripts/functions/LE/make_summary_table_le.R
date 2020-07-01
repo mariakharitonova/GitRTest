@@ -1,4 +1,4 @@
-make_summary_table <- function(dataset, name){
+make_summary_table_le <- function(dataset, name){
   # colors here: http://research.stowers.org/mcm/efg/R/Color/Chart/ColorChart.pdf
   datatable(
     dataset, 

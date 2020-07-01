@@ -12,6 +12,7 @@ params:
   file_path: data
   school_name: x
   set_title: x
+  version: x
 geometry: "left=1in,right=1in,top=1in,bottom=0.6in"
 
 
@@ -31,7 +32,7 @@ options(kableExtra.latex.load_packages = FALSE)
 
 
 ```{r setup, include=FALSE}
-source("/Volumes/GoogleDrive/My\ Drive/xSEL\ Labs/Scripts/Dashboards/flexdashboard/functions/EE/plot_change_over_time_ee_function_pdf.R")
+#source("/Volumes/GoogleDrive/My\ Drive/xSEL\ Labs/Scripts/Dashboards/flexdashboard/functions/EE/plot_change_over_time_ee_function_pdf.R")
   
 common_students <- intersect(district$StudentID, district_time2$StudentID)
 
@@ -46,19 +47,22 @@ school_common_2 <- district_time2[(district_time2$School == params$school_name &
 ```
 ##  School-level report for `r  params$school_name`, Change Over Time
 
-This is a school-level report that compares student performance on SELweb EE in `r params$school_name` across both timepoints (usually Spring vs Fall). Only the students who completed SELweb both times are included in this report. 
+This is a school-level report that compares student performance on SELweb `r params$version` in `r params$school_name` across both timepoints (usually Spring vs Fall). Only the students who completed SELweb both times are included in this report. 
 
-The summary plot shows what proportion of students in the `r params$school_name` fall into each of the 4 performance levels at each timepoint. The summary table compares standard scores for SELweb EE competencies for students in each classroom in `r params$school_name`  across the two timepoints. See the attached appendix for more information about SELweb EE competencies, standard scores, and performance levels.
+The summary plot shows what proportion of students in the `r params$school_name` fall into each of the 4 performance levels at each timepoint. The summary table compares standard scores for SELweb EE competencies for students in each classroom in `r params$school_name`  across the two timepoints. See the attached appendix for more information about SELweb `r params$version` competencies, standard scores, and performance levels.
 
 ## Summary Plot for School
 ```{r summary-plot, echo = FALSE, warning = FALSE}
 
 if(dim(school_common_1)[1] >=10 & dim(school_common_2)[1] >= 10){
-  
-  school_time1_plotting <- transform_for_plotting(school_common_1)
-  school_time2_plotting <- transform_for_plotting(school_common_2)
+  if(version == "EE"){
+    school_time1_plotting <- transform_for_plotting(school_common_1)
+    school_time2_plotting <- transform_for_plotting(school_common_2)
+  } else if(version == "LE"){
+    school_time1_plotting <- transform_for_plotting_le(school_common_1)
+    school_time2_plotting <- transform_for_plotting_le(school_common_2)
+  }
 
-  
   data_1 <- school_time1_plotting %>% 
   mutate(Timepoint = "Fall")
 
@@ -66,9 +70,11 @@ if(dim(school_common_1)[1] >=10 & dim(school_common_2)[1] >= 10){
     mutate(Timepoint = "Spring")
 
   data_change <- rbind(data_1, data_2) 
-  
-  plot_change_over_time_ee_pdf(data_change, params$school_name, dim(school_common_1)[1])
-
+  if(version == "EE"){
+    plot_change_over_time_ee_pdf(data_change, params$school_name, dim(school_common_1)[1])
+  } else if(version== "LE"){
+    plot_change_over_time_le_pdf(data_change, params$school_name, dim(school_common_1)[1])
+  }
 
 
 
@@ -86,24 +92,41 @@ Above average: $\geq$ 115; At or around average: 90-114; Below average: 70-89; W
 ## Summary Table for School
 ```{r summary-table, warning = FALSE, echo = FALSE}
 
-
-merged_teacher_links_pdf <- left_join(teacher_links_1_pdf, teacher_links_2_pdf, by = c("Teacher", "Grade")) %>% 
+if(version == "EE"){
+  merged_teacher_links_pdf <- left_join(teacher_links_1_pdf, teacher_links_2_pdf, by = c("Teacher", "Grade")) %>% 
   select(Teacher, Grade, Fall = "Number of children.x", Spring = "Number of children.y", Fall = "Overall Score.x", Spring = "Overall Score.y",
          Fall = "Emotion Recognition.x", Spring = "Emotion Recognition.y", Fall = "Social Perspective-Taking.x", Spring = "Social Perspective-Taking.y", Fall = "Social Problem-Solving.x", Spring = "Social Problem-Solving.y", Fall = "Self Control.x",
          Spring = "Self Control.y") %>% 
   replace(is.na(.), "")
-
-
-### Summary Scores by School
-kable(merged_teacher_links_pdf, "latex", booktabs = T, align = "lccccccccccccc", linesep = "") %>% 
-  kable_styling(latex_options = c("striped", "hold_position", "bordered"), full_width = F) %>% 
-  add_header_above(c("", "", "N" = 2, "Overall" = 2, "Emotion \nRecognition" = 2, "Social \nPerspective-\nTaking" = 2,
+  
+  ### Summary Scores by School
+  kable(merged_teacher_links_pdf, "latex", booktabs = T, align = "lccccccccccccc", linesep = "") %>% 
+    kable_styling(latex_options = c("striped", "hold_position", "bordered"), full_width = F) %>% 
+    add_header_above(c("", "", "N" = 2, "Overall" = 2, "Emotion \nRecognition" = 2, "Social \nPerspective-\nTaking" = 2,
                      "Social \nProblem-\nSolving" = 2, "Self Control" = 2)) %>% 
-  column_spec(2:13, width = "0.8cm") 
+    column_spec(2:13, width = "0.8cm") 
+
+
+} else if(version == "LE"){
+  merged_teacher_links_pdf <- left_join(teacher_links_1_pdf, teacher_links_2_pdf, by = c("Teacher", "Grade")) %>% 
+  select(Teacher, Grade, Fall = "Number of children.x", Spring = "Number of children.y", Fall = "Overall SEL.x", Spring = "Overall SEL.y",
+         Fall = "Understanding Others.x", Spring = "Understanding Others.x", Fall = "Social Problem-Solving.x", Spring = "Social Problem-Solving.y", Fall = "Self Control.x",
+         Spring = "Self Control.y") %>% 
+  replace(is.na(.), "")
+  
+  kable(merged_teacher_links_pdf, "latex", booktabs = T, align = "lcccccccccccc", linesep = "") %>% 
+    kable_styling(latex_options = c("striped", "hold_position", "bordered"), full_width = F) %>% 
+    add_header_above(c("", "", "N" = 2, "Overall" = 2, "Understanding \nOthers" = 2,
+                     "Social \nProblem-\nSolving" = 2, "Self Control" = 2)) %>% 
+    column_spec(2:12, width = "0.8cm") 
+}
+
+
 
 
 cat('\n\n\n\n')
 
 ```
 
-\includepdf[pages={-}]{report_appendix.pdf}
+`r if(params$version =="EE") {"\\includepdf[pages={-}]{report_appendix.pdf}"}`
+`r if(params$version =="LE") {"\\includepdf[pages={-}]{report_appendix_le.pdf}"}`
